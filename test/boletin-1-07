@@ -1,0 +1,202 @@
+
+<!-- saved from url=(0050)http://sil.senado.cl/cgi-bin/sil_proyectos.pl?1-07 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>websil</title>
+<link rel="stylesheet" href="http://sil.senado.cl/css/table.css">
+
+<script language="javascript">
+<!--
+
+  var verok = 1; //version adecuada del navigator.
+
+  browserName = navigator.appName;
+  browserVer = parseInt(navigator.appVersion);
+  if ((browserName == "Netscape" && browserVer >= 3)
+     || (browserName == "Microsoft Internet Explorer" && browserVer >= 4) ) {
+    verok = 1;
+  } else {
+    verok = 0;
+  };
+
+
+  // Precarga las imagenes del menu.
+  if (verok == 1) {
+
+    // Define los identificadores de las imagenes.
+    // *** Aqu\222 debes colocar los prefijos de las imagenes que usaras
+    // en el menu.
+    botID = new Array('inf','ofi','ind','urg','tra','aut','min','veto','com');
+    var imagidx = 'tra'; // Imagen inicialmente seleccionada. <!--PANCHO-->
+
+    // Define el path (relativo) donde se encuentran las imagenes.
+    // *** Aqui debes colocar el directorio donde se encuentran las imagenes,
+    // relativo al lugar donde se encuentra esta pagina.
+    var path = '../../imag/boto/';
+
+    // Define y carga las imagenes correspondientes a los estados de
+    // los botones.
+    for (var i=0;i<botID.length;i++) {
+
+      eval('menu_' + botID[i] + '_of = new Image()');
+      eval('menu_' + botID[i] + '_of.src = "' + path + botID[i] + '_of.gif"');
+      eval('menu_' + botID[i] + '_on = new Image()');
+      eval('menu_' + botID[i] + '_on.src = "' + path + botID[i] + '_on.gif"');
+    };
+
+  };
+
+  // <!--PANCHO-->
+
+  function MM_openBrWindow(theURL,winName,features) { //v2.0
+    window.open(theURL,winName,features);
+  }
+
+  function ima_ck(nom) {
+    var aux = imagidx;
+    imagidx = nom;
+    ima_of(nom);
+    return true;
+  };
+
+  function ima_on(nom) {
+    if (verok == 1) {
+      imgOn = eval("menu_" + nom + "_on.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  function ima_of(nom) {
+    if ((verok == 1) && (imagidx != nom)) {
+      imgOn = eval("menu_" + nom + "_of.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  // <!--/PANCHO-->
+
+//-->
+</script>
+
+<style type="text/css"></style></head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<a name="top"></a>
+
+<table width="624" border="0" cellspacing="0" cellpadding="0">
+  <tbody><tr align="left" valign="top">
+    <td width="10"><img src="./boletin-1_07_files/block_transparente.gif" width="10" height="10"></td>
+    <td width="615"><img src="./boletin-1_07_files/block_transparente.gif" width="10" height="10"></td>
+  </tr>
+  <tr align="left" valign="top">
+    <td width="10"><img src="./boletin-1_07_files/block_transparente.gif" width="10" height="10"></td>
+    <td width="615">
+      <table width="615" border="0" cellspacing="0" cellpadding="1">
+        <tbody><tr bgcolor="#003366">
+          <td>
+      <table width="615" border="0" cellspacing="0" cellpadding="0">
+        <tbody><tr bgcolor="#003366">
+          <td>
+            <table width="614" border="0" cellspacing="0" cellpadding="0">
+              <tbody><tr bgcolor="#FFFFFF" align="left" valign="top">
+                <td>
+                  <table border="0" cellspacing="2" width="614" cellpadding="0">
+                    <tbody><tr bgcolor="#FFFFFF">
+                      <td align="right" valign="middle" width="150" bgcolor="#ECEDEE">
+                       <span class="TITULAR">&nbsp;N°
+                        Boletín:&nbsp;&nbsp;</span></td>
+                      <td colspan="3" align="left" valign="middle" bgcolor="#f6f6f6"><span class="azu">1-07
+                       </span></td></tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Título:&nbsp;&nbsp;</span></td>
+                      <td colspan="3" align="left" bgcolor="#f6f6f6"><span class="TEXTpais">Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte.
+                      </span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                        Fecha de Ingreso:&nbsp;&nbsp;</span></td>
+                      <td colspan="3" align="left" valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo">Martes 20 de Marzo, 1990</span></td></tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Iniciativa:&nbsp;&nbsp;</span></td>
+                      <td align="left" valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">Mensaje</span></td>
+                      <td align="right" valign="middle" bgcolor="#ECEDEE" width="120"><span class="TITULAR">
+                        Tipo de proyecto:&nbsp;&nbsp;</span></td>
+                      <td align="left" valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">Proyecto de ley</span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Cámara de origen:&nbsp;&nbsp;</span></td>
+                      <td align="left" valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">C.Diputados </span></td>
+                      <td align="right" valign="middle" bgcolor="#ECEDEE" width="120"><span class="TITULAR">
+                       Urgencia actual:&nbsp;&nbsp;</span></td>
+                      <td align="left" valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo"></span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Etapa:&nbsp;&nbsp;</span></td>
+                      <td colspan="3" align="left" valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo">Tramitación terminada</span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align="right" valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">&nbsp;</span></td>
+                      <td colspan="3" align="left" valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo"><a href="http://sil.senado.cl/cgi-bin/sil_proyectos.pl?1-07#" onclick="MM_openBrWindow(&#39;http://www.leychile.cl/Navegar?idLey=19029&amp;idVersion=1991-01-23&#39;,&#39;general&#39;,&#39;scrollbars=yes,width=1024,height=800&#39;)">Ley Nº 19.029</a> (D.Oficial: 23/01/91)</span></td>
+                    </tr>
+                  </tbody></table>
+                </td>
+              </tr>
+            </tbody></table>
+          </td>
+        </tr>
+      </tbody></table>
+
+   </td>
+   </tr><tr>
+   <td>
+
+      <table width="615" border="0" cellspacing="0" cellpadding="1">
+        <tbody><tr bgcolor="#003366">
+          <td>
+            <table width="613" border="0" cellspacing="0" cellpadding="5">
+              <tbody><tr bgcolor="#FFFFFF" align="center" valign="top">
+                <td>
+                  <table width="600" border="0" cellspacing="0" cellpadding="0">
+                    <tbody><tr align="center" valign="middle">
+                      <td>
+                        <a href="test/sil_tramitacion-1-07.html" onmouseover="ima_on(&#39;tra&#39;)" onmouseout="ima_of(&#39;tra&#39;)" onclick="ima_ck(&#39;tra&#39;)" target="cont_if1">
+                        <img src="./boletin-1_07_files/tra_of.gif" width="87" height="14" border="0" name="tra"></a></td>
+                      <td>
+                       <a href="http://sil.senado.cl/cgi-bin/sil_informes.pl?1252,,," onmouseover="ima_on(&#39;inf&#39;)" onmouseout="ima_of(&#39;inf&#39;)" onclick="ima_ck(&#39;inf&#39;)" target="cont_if1">
+                       <img src="./boletin-1_07_files/inf_of.gif" width="69" height="14" border="0" name="inf"></a></td>
+                      <td>
+                       <a href="test/sil_oficios-1-07.html" onmouseover="ima_on(&#39;ofi&#39;)" onmouseout="ima_of(&#39;ofi&#39;)" onclick="ima_ck(&#39;ofi&#39;)" target="cont_if1">
+                       <img src="./boletin-1_07_files/ofi_of.gif" width="60" height="14" border="0" name="ofi"></a></td>
+                      <td>
+                       <a href="http://sil.senado.cl/cgi-bin/sil_indicaciones.pl?1252" onmouseover="ima_on(&#39;ind&#39;)" onmouseout="ima_of(&#39;ind&#39;)" onclick="ima_ck(&#39;ind&#39;)" target="cont_if1">
+                        <img src="./boletin-1_07_files/ind_of.gif" width="91" height="14" border="0" name="ind"></a></td>
+                      <td>
+                       <a href="http://sil.senado.cl/cgi-bin/sil_comparados.pl?1252" onmouseover="ima_on(&#39;com&#39;)" onmouseout="ima_of(&#39;com&#39;)" onclick="ima_ck(&#39;com&#39;)" target="cont_if1">
+                        <img src="./boletin-1_07_files/com_of.gif" width="87" height="14" border="0" name="com"></a></td>
+                      <td>
+                        <a href="test/sil_urgencias-1-07.html" onmouseover="ima_on(&#39;urg&#39;)" onmouseout="ima_of(&#39;urg&#39;)" onclick="ima_ck(&#39;urg&#39;)" target="cont_if1">
+                        <img src="./boletin-1_07_files/urg_of.gif" width="75" height="14" border="0" name="urg"></a></td>
+                      <td></td>
+                       <td></td>
+                    </tr>
+                  </tbody></table>
+                </td>
+              </tr>
+            </tbody></table>
+          </td>
+        </tr>
+      </tbody></table>
+     
+</td></tr>
+<tr><td>&nbsp;</td></tr>
+</tbody></table>
+
+<iframe name="cont_if1" frameborder="0" marginheight="0" width="100%" height="3000"></iframe>
+
+
+</td></tr></tbody></table><mytubeelement id="myTubeElement" desktopnotification="true" soundnotification="true" enable="true" loop="false" hidepopup="true" autoplay="false" autobuffer="false" autoplayonbuffer="false" autoplayonbufferpercentage="42" autoplayonsmartbuffer="true" quality="default" fshd="false" onlynotification="false" enablefullscreen="true" savebandwidth="false" hideannotations="false" turnoffpagedbuffering="false"><bundle label_delimitor=":" percentage="%" smart_buffer="Smart Buffer" start_playing_when_buffered="Start playing when buffered" sound="Sound" desktop_notification="Desktop Notification" continuation_on_next_line="-" loop="Loop" only_notify="Only Notify" estimated_time="Estimated Time" global_preferences="Global Preferences" no_notification_supported_on_your_browser="No notification style supported on your browser version" video_buffered="Video Buffered" buffered="Buffered" hyphen="-" buffered_message="The video has been buffered as requested and is ready to play." not_supported="Not Supported" on="On" off="Off" click_to_enable_for_this_site="Click to enable for this site" desktop_notification_denied="You have denied permission for desktop notification for this site" notification_status_delimitor=";" error="Error" adblock_interferance_message="Adblock (or similar extension) is known to interfere with SmartVideo. Please add this url to adblock whitelist." calculating="Calculating" waiting="Waiting" will_start_buffering_when_initialized="Will start buffering when initialized" will_start_playing_when_initialized="Will start playing when initialized" completed="Completed" buffering_stalled="Buffering is stalled. Will stop." stopped="Stopped" hr="Hr" min="Min" sec="Sec" any_moment="Any Moment" extension_id="lnkdbjbjpnpjeciipoaflmpcddinpjjp" tab_id="34"></bundle></mytubeelement></body><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script><link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"></html>
