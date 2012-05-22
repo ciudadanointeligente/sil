@@ -1,0 +1,164 @@
+<html>
+<head>
+<title>websil</title>
+<link rel="stylesheet" href="../../css/table.css">
+
+<SCRIPT LANGUAGE="javascript">
+<!--
+
+  var verok = 1; //version adecuada del navigator.
+
+  browserName = navigator.appName;
+  browserVer = parseInt(navigator.appVersion);
+  if ((browserName == "Netscape" && browserVer >= 3)
+     || (browserName == "Microsoft Internet Explorer" && browserVer >= 4) ) {
+    verok = 1;
+  } else {
+    verok = 0;
+  };
+
+
+  // Precarga las imagenes del menu.
+  if (verok == 1) {
+
+    // Define los identificadores de las imagenes.
+    // *** Aqu\222 debes colocar los prefijos de las imagenes que usaras
+    // en el menu.
+    botID = new Array('inf','ofi','ind','urg','tra','aut','min','veto','com');
+    var imagidx = 'tra'; // Imagen inicialmente seleccionada. <!--PANCHO-->
+
+    // Define el path (relativo) donde se encuentran las imagenes.
+    // *** Aqui debes colocar el directorio donde se encuentran las imagenes,
+    // relativo al lugar donde se encuentra esta pagina.
+    var path = '../../imag/boto/';
+
+    // Define y carga las imagenes correspondientes a los estados de
+    // los botones.
+    for (var i=0;i<botID.length;i++) {
+
+      eval('menu_' + botID[i] + '_of = new Image()');
+      eval('menu_' + botID[i] + '_of.src = "' + path + botID[i] + '_of.gif"');
+      eval('menu_' + botID[i] + '_on = new Image()');
+      eval('menu_' + botID[i] + '_on.src = "' + path + botID[i] + '_on.gif"');
+    };
+
+  };
+
+  // <!--PANCHO-->
+
+  function MM_openBrWindow(theURL,winName,features) { //v2.0
+    window.open(theURL,winName,features);
+  }
+
+  function ima_ck(nom) {
+    var aux = imagidx;
+    imagidx = nom;
+    ima_of(nom);
+    return true;
+  };
+
+  function ima_on(nom) {
+    if (verok == 1) {
+      imgOn = eval("menu_" + nom + "_on.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  function ima_of(nom) {
+    if ((verok == 1) && (imagidx != nom)) {
+      imgOn = eval("menu_" + nom + "_of.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  // <!--/PANCHO-->
+
+//-->
+</SCRIPT>
+
+</head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<a name="top"></a>
+
+     <table width="625" border="0" cellspacing="0" cellpadding="0">
+     <tr bgcolor="#FFFFFF">
+       <td  bgcolor="#FFFFFF">
+     <table width="561" border="0" cellspacing="0" cellpadding="0">
+     <tr bgcolor="#003366">
+       <td>
+       <table width="560" cellspacing="1" cellpadding="1" border="0">
+
+       <tr align="center">
+         <td bgcolor="#D9D9D9" width="68" align="left" valign="middle">
+         <span class="TITULAR">&nbsp;N&deg;
+         Bolet&iacute;n </span></td>
+         <td bgcolor="#D9D9D9" colspan="1" align="left" valign="middle">
+         <span class="TITULAR">&nbsp;Suma</span>
+         <font color="#D9D9D9">.</font></td>
+         <td bgcolor="#D9D9D9" align="left" valign="middle">
+         <span class="TITULAR">&nbsp;</span></td>
+       </tr>
+         <tr align="center">
+           <td width="68" bgcolor="#FFFFFF" align="left" valign="top">&nbsp;<span class="azu">1-07
+            </span></td>
+           <td width="457" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTpais">Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte.
+            </span></td>
+           <td width="35" bgcolor="#FFFFFF" align="center" valign="top">
+            <a href="test/boletin-1-07">
+            <img src="../../imag/auxi/mas_texto.gif" width="22" height="15" border="0"></a></td>
+         </tr>
+         <tr align="center">
+           <td width="68" bgcolor="#FFFFFF" align="left" valign="top">&nbsp;<span class="azu">2-07
+            </span></td>
+           <td width="457" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTpais">Modifica diversos textos legales que indican, a fin de garantizar en mejor forma los derechos de las personas.
+            </span></td>
+           <td width="35" bgcolor="#FFFFFF" align="center" valign="top">
+            <a href="../../cgi-bin/sil_proyectos.pl?2-07">
+            <img src="../../imag/auxi/mas_texto.gif" width="22" height="15" border="0"></a></td>
+         </tr>
+         <tr align="center">
+           <td width="68" bgcolor="#FFFFFF" align="left" valign="top">&nbsp;<span class="azu">3-07
+            </span></td>
+           <td width="457" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTpais">Modifica la Ley Nº 18.314, sobre Conductas Terroristas y su Penalidad.
+            </span></td>
+           <td width="35" bgcolor="#FFFFFF" align="center" valign="top">
+            <a href="../../cgi-bin/sil_proyectos.pl?3-07">
+            <img src="../../imag/auxi/mas_texto.gif" width="22" height="15" border="0"></a></td>
+         </tr>
+         <tr align="center">
+           <td width="68" bgcolor="#FFFFFF" align="left" valign="top">&nbsp;<span class="azu">4-03
+            </span></td>
+           <td width="457" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTpais">Modifica ley General de Pesca y Acuicultura.
+            </span></td>
+           <td width="35" bgcolor="#FFFFFF" align="center" valign="top">
+            <a href="../../cgi-bin/sil_proyectos.pl?4-03">
+            <img src="../../imag/auxi/mas_texto.gif" width="22" height="15" border="0"></a></td>
+         </tr>
+         <tr align="center">
+           <td width="68" bgcolor="#FFFFFF" align="left" valign="top">&nbsp;<span class="azu">5-15
+            </span></td>
+           <td width="457" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTpais">Suspende la exigibilidad del Seguro de Responsabilidad Civil por daños a Vehículos de terceros hasta la oportunidad que indica.
+            </span></td>
+           <td width="35" bgcolor="#FFFFFF" align="center" valign="top">
+            <a href="../../cgi-bin/sil_proyectos.pl?5-15">
+            <img src="../../imag/auxi/mas_texto.gif" width="22" height="15" border="0"></a></td>
+         </tr></table>
+       </td>
+       </tr>
+       </table>
+       </td>
+       </tr>
+       <tr> 
+       <td align=center class=azu>
+       sil.senado.cl
+       </td>
+       </tr>
+       </table>
+      
+<iframe name="cont_if1" frameborder="0" marginheight="0" width="100%" 
+  height="3000"></iframe>
+</body>
+</html>
