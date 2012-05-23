@@ -1,7 +1,7 @@
+# coding: utf-8
 require 'rubygems'
-require 'htmlentities'
-require 'rest_client'
-require  File.join(File.dirname(__FILE__), '.', 'sil')
+require 'rest-client'
+require './sil'
 
 url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl'
 puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
@@ -11,23 +11,31 @@ html = file.read
 robot = SilRobot.new(html)
 robot.lamb = lambda {|proyecto, a| puts proyecto["id"]
 	url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
-	coder = HTMLEntities.new
 	
+	#preprocesing
+	stage = proyecto["etapa"]
+	stage.force_encoding 'Windows-1252'
+	stage.encode! 'utf-8'
+	title = proyecto["title"]
+	title.force_encoding 'Windows-1252'
+	title.encode! 'utf-8'
+	origin_chamber = proyecto["camara_origen"]
+	origin_chamber.force_encoding 'Windows-1252'
+	origin_chamber.encode! 'utf-8'
+	creation_date = proyecto["fecha_de_ingreso"]
+	creation_date.force_encoding 'Windows-1252'
+	creation_date.encode! 'utf-8'
+
 	data = {
-		:stage => proyecto["etapa"],
-		:origin_chamber => proyecto["camara_origen"],
+		:stage => stage,
+		:origin_chamber => origin_chamber,
 		:id => proyecto['id'],
-		:title => proyecto['title'],
-		:creation_date => proyecto["fecha_de_ingreso"],
-#		:stage => "API - Example - Etapa",
-#		:origin_chamber => "API - Example - Camara Origen",
-#		:id => "CL-3456-78",
-#		:title => "API - Example - Title",
-#		:creation_date => "2009-09-29T04:00:00Z",
+		:title => title,
+		:creation_date => creation_date,
 	}
-	puts '<---------'
-	p data
-	puts '---------->'
+#	puts '<---------'
+#	p data
+#	puts '---------->'
 	RestClient.put url, data, {:content_type => :json}
 }
 

@@ -1,11 +1,6 @@
 # coding: utf-8
-
-#require  File.join(File.dirname(__FILE__), '..', 'sil')
 require './sil'
 require 'test/unit'
-require 'unicode'
-$KCODE = 'UTF-8'
-
 
 class TestSil < Test::Unit::TestCase
 	def setup
@@ -37,19 +32,18 @@ class TestSil < Test::Unit::TestCase
 	end
 	def test_segundoProyectContainsData
 		proyectos = @robot.procesar
-		expected_title = "Modifica diversos textos legales que indican, a fin de garantizar en mejor forma los derechos de las personas."
+
 		assert_equal("2-07", proyectos[1]["id"])
-		assert_equal(expected_title, proyectos[1]["title"])
 	end
 	def test_procesaDatosBasicosBoletin
 		file = File.open("./test/boletin-1-07", "rb")
 		html = file.read
 		abolir_pena_de_muerte_boletin = @robot.procesarUnBoletin(html)
-		expected_title = "Modifica los C&oacute;digos de Justicia Militar, Penal y Aeron&aacute;utico para abolir la Pena de Muerte."
+		expected_title = "Modifica los C\xF3digos de Justicia Militar, Penal y Aeron\xE1utico para abolir la Pena de Muerte."
 		expected_fecha = "Martes 20 de Marzo, 1990"
 		expected_iniciativa = "Mensaje"
 		expected_camara_origen = "C.Diputados"
-		expected_etapa = "Tramitaci&oacute;n terminada"
+		expected_etapa = "Tramitaci\xF3n terminada"
 		assert_equal(expected_title, abolir_pena_de_muerte_boletin["title"])
 		assert_equal(expected_fecha, abolir_pena_de_muerte_boletin["fecha_de_ingreso"])
 		assert_equal(expected_iniciativa, abolir_pena_de_muerte_boletin["iniciativa"])
@@ -72,10 +66,10 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
 		html = file.read
 		tramitaciones = @robot.procesarTramitaciones(html)
-		expected_etapa = "Primer tr\341mite constitucional / C.Diputados"
-		assert_equal("/", tramitaciones[0]["sesion"])
-		assert_equal("11/03/1990", tramitaciones[0]["fecha"])
-		assert_equal("Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
+		expected_etapa = " Primer tr\xE1mite constitucional / C.Diputados"
+		assert_equal("  /", tramitaciones[0]["sesion"])
+		assert_equal(" 11/03/1990", tramitaciones[0]["fecha"])
+		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
 
@@ -91,8 +85,8 @@ class TestSil < Test::Unit::TestCase
 		oficio = @robot.procesaUnOficio(tr.root)
 		assert_equal '116', oficio['numero']
 		assert_equal '27/11/90', oficio['fecha']
-		assert_equal 'Oficio rechazo modificaciones a C&aacute;mara Revisora', oficio['oficio']
-		assert_equal 'Tercer tr&aacute;mite constitucional', oficio['etapa']
+		assert_equal 'Oficio rechazo modificaciones a Cámara Revisora', oficio['oficio']
+		assert_equal 'Tercer trámite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
 		file = File.open("./test/sil_oficios-1-07.html", "rb")
