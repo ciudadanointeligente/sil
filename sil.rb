@@ -1,8 +1,11 @@
+# coding: utf-8
+
 require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
-
-# encoding: utf-8
+require 'htmlentities'
+require 'unicode'
+$KCODE = 'UTF-8'
 
 class SilRobot
 	attr_accessor :html, :base_url, :url_tramitacion_base, :lamb, :proyectos_buffer, :url_oficios_base, :url_urgencias_base
@@ -15,9 +18,10 @@ class SilRobot
 		@url_urgencias_base = 'http://sil.senado.cl/cgi-bin/'
 		@lamb = lambda {|proyecto, a| a.push(proyecto) }
 		@proyectos_buffer = Array.new
+		@coder = HTMLEntities.new
 	end
 	def procesar
-		doc = Nokogiri::HTML(@html, nil, 'utf-8')
+		doc = Nokogiri::HTML(@html, nil, 'ISO-8859-1')
 		doc.xpath('//html/body/table//tr/td/table//tr/td/table//tr[(position()>1)]').each do |tr|
 			proyecto = procesarUnProyectoDeLey(tr)
 			@lamb.call(proyecto, @proyectos_buffer)
@@ -29,8 +33,10 @@ class SilRobot
 		result = Hash.new
 		result["id"] = tr.at_xpath('td[1]/span/text()').to_s.strip
 		#puts 'procesando el proyecto '+ result['id']
-		result["title"] = tr.at_xpath('td[2]/span/text()').to_html.strip
-		url = tr.at_xpath('td[3]/a/@href').to_s.strip
+		#title = tr.at_xpath('td[2]/span/text()').to_s.strip
+		#p title.encoding.name
+		#result["title"] = title
+		url = tr.at_xpath('td[3]/a/@href').to_html.strip
 		begin
 			url = @base_url+result["id"]
 			file = open(url)
@@ -42,11 +48,12 @@ class SilRobot
 		result
 	end
 	def procesarUnBoletin(html)
-		html = Nokogiri::HTML(html, nil, 'utf-8')
+		html = Nokogiri::HTML(html, nil, 'ISO-8859-1')
 		boletin  = Hash.new
 		path_base = "/html/body/table//tr[2]/td[2]/table//"
 		path_url = "tr[2]/td/table//tr/td/table//tr/td/table//tr/"
 		path_detalle = "tr/td/table//tr/td/table//tr/td/table//tr"
+		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').to_s.strip
 		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').to_s.strip
 		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').to_s.strip
 		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').to_s.strip
@@ -81,7 +88,7 @@ class SilRobot
 		boletin
 	end
 	def procesarTramitaciones(html)
-		html = Nokogiri::HTML(html, nil, 'utf-8')
+		html = Nokogiri::HTML(html, nil, 'ISO-8859-1')
 		tramitaciones  = Array.new
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
 			tramitaciones.push(procesarUnaTramitacion(tr))
@@ -98,7 +105,7 @@ class SilRobot
 	end
 
 	def procesarOficios(html)
-		html = Nokogiri::HTML(html, nil, 'utf-8')
+		html = Nokogiri::HTML(html, nil, 'ISO-8859-1')
 		oficios = Array.new
 
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
@@ -117,7 +124,7 @@ class SilRobot
 	end
 	
 	def procesarUrgencias(html)
-		html = Nokogiri::HTML(html, nil, 'utf-8')
+		html = Nokogiri::HTML(html, nil, 'ISO-8859-1')
 		urgencias = Array.new
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
 			urgencias.push(procesaUnaUrgencia(tr))

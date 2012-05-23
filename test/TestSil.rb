@@ -1,7 +1,11 @@
-require  File.join(File.dirname(__FILE__), '..', 'sil')
-require 'test/unit'
+# coding: utf-8
 
-# encoding: utf-8
+#require  File.join(File.dirname(__FILE__), '..', 'sil')
+require './sil'
+require 'test/unit'
+require 'unicode'
+$KCODE = 'UTF-8'
+
 
 class TestSil < Test::Unit::TestCase
 	def setup
@@ -25,9 +29,7 @@ class TestSil < Test::Unit::TestCase
 	def test_primerProyectContainsData
 		proyectos = @robot.procesar
 		
-		expected_title = "Modifica los C\363digos de Justicia Militar, Penal y Aeron\341utico para abolir la Pena de Muerte."
 		assert_equal("1-07", proyectos[0]["id"])
-		assert_equal(expected_title, proyectos[0]["title"])
 		assert proyectos[0].has_key?("fecha_de_ingreso")
 		assert proyectos[0].has_key?("iniciativa")
 		assert proyectos[0].has_key?("camara_origen")
@@ -43,10 +45,12 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/boletin-1-07", "rb")
 		html = file.read
 		abolir_pena_de_muerte_boletin = @robot.procesarUnBoletin(html)
+		expected_title = "Modifica los C&oacute;digos de Justicia Militar, Penal y Aeron&aacute;utico para abolir la Pena de Muerte."
 		expected_fecha = "Martes 20 de Marzo, 1990"
 		expected_iniciativa = "Mensaje"
 		expected_camara_origen = "C.Diputados"
-		expected_etapa = "Tramitaci\363n terminada"
+		expected_etapa = "Tramitaci&oacute;n terminada"
+		assert_equal(expected_title, abolir_pena_de_muerte_boletin["title"])
 		assert_equal(expected_fecha, abolir_pena_de_muerte_boletin["fecha_de_ingreso"])
 		assert_equal(expected_iniciativa, abolir_pena_de_muerte_boletin["iniciativa"])
 		assert_equal(expected_camara_origen, abolir_pena_de_muerte_boletin["camara_origen"])
@@ -87,8 +91,8 @@ class TestSil < Test::Unit::TestCase
 		oficio = @robot.procesaUnOficio(tr.root)
 		assert_equal '116', oficio['numero']
 		assert_equal '27/11/90', oficio['fecha']
-		assert_equal 'Oficio rechazo modificaciones a Cámara Revisora', oficio['oficio']
-		assert_equal 'Tercer trámite constitucional', oficio['etapa']
+		assert_equal 'Oficio rechazo modificaciones a C&aacute;mara Revisora', oficio['oficio']
+		assert_equal 'Tercer tr&aacute;mite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
 		file = File.open("./test/sil_oficios-1-07.html", "rb")
