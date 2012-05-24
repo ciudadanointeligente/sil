@@ -129,5 +129,33 @@ class SilRobot
 		urgencia['numero_mensaje_termino'] = tr.at_xpath("td[5]/span/text()").to_s.strip
 		urgencia
 	end
+	def parseaUnaFecha(fecha)
+		fecha.slice! "de "
+		english_to_spanish = {
+		  'january' => 'Enero',
+		  'february' => 'Febrero',
+		  'march' => 'Marzo',
+		  'april' => 'Abril',
+		  'may' => 'Mayo',
+		  'june' => 'Junio',
+		  'july' => 'Julio',
+		  'august' => 'Agosto',
+		  'september' => 'Septiembre',
+		  'october' => 'Octubre',
+		  'november' => 'Noviembre',
+		  'december' => 'Diciembre',
+		  'monday' => 'Lunes',
+		  'tuesday' => 'Martes',
+		  'wednesday' => 'Miércoles',
+		  'thursday' => 'Jueves',
+		  'friday' => 'Viernes',
+		  'saturday' => 'Sábado',
+		  'sunday' => 'Domingo',
+		}
+		english_to_spanish.each do |en, es|
+			fecha.gsub!(/\b#{es}\b/i, en)
+		end
+		fecha
+	end
 end
 

@@ -131,5 +131,22 @@ class TestSil < Test::Unit::TestCase
 		assert urgencias[0].has_key? 'fecha_termino'
 		assert urgencias[0].has_key? 'numero_mensaje_termino'
 	end
+
+	def test_parseaUnaFecha
+		require 'date'
+		fecha = "Miércoles 1 de Agosto, 1990"
+		expected_fecha = "1990-08-01"
+		resultado = @robot.parseaUnaFecha fecha
+		fecha = Date.parse fecha
+		assert_equal expected_fecha, fecha.to_s
+	end
+	def test_parseaUnaFecha2
+		require 'date'
+		fecha = "Martes 31 de Julio, 1990"
+		expected_fecha = "1990-07-31"
+		resultado = @robot.parseaUnaFecha fecha
+		fecha = Date.parse fecha
+		assert_equal expected_fecha, fecha.to_s
+	end
 end
 
