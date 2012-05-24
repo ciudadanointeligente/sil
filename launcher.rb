@@ -25,6 +25,7 @@ robot.lamb = lambda {|proyecto, a| puts proyecto["id"]
 	creation_date = proyecto["fecha_de_ingreso"]
 	creation_date.force_encoding 'Windows-1252'
 	creation_date.encode! 'utf-8'
+	creation_date = robot.parseaUnaFecha(creation_date)
 
 	data = {
 		:stage => stage,
