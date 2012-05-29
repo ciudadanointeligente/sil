@@ -1,0 +1,209 @@
+
+<html>
+<head>
+<title>websil</title>
+<link rel="stylesheet" href="../../css/table.css">
+
+<SCRIPT LANGUAGE="javascript">
+<!--
+
+  var verok = 1; //version adecuada del navigator.
+
+  browserName = navigator.appName;
+  browserVer = parseInt(navigator.appVersion);
+  if ((browserName == "Netscape" && browserVer >= 3)
+     || (browserName == "Microsoft Internet Explorer" && browserVer >= 4) ) {
+    verok = 1;
+  } else {
+    verok = 0;
+  };
+
+
+  // Precarga las imagenes del menu.
+  if (verok == 1) {
+
+    // Define los identificadores de las imagenes.
+    // *** Aqu\222 debes colocar los prefijos de las imagenes que usaras
+    // en el menu.
+    botID = new Array('inf','ofi','ind','urg','tra','aut','min','veto','com');
+    var imagidx = 'tra'; // Imagen inicialmente seleccionada. <!--PANCHO-->
+
+    // Define el path (relativo) donde se encuentran las imagenes.
+    // *** Aqui debes colocar el directorio donde se encuentran las imagenes,
+    // relativo al lugar donde se encuentra esta pagina.
+    var path = '../../imag/boto/';
+
+    // Define y carga las imagenes correspondientes a los estados de
+    // los botones.
+    for (var i=0;i<botID.length;i++) {
+
+      eval('menu_' + botID[i] + '_of = new Image()');
+      eval('menu_' + botID[i] + '_of.src = "' + path + botID[i] + '_of.gif"');
+      eval('menu_' + botID[i] + '_on = new Image()');
+      eval('menu_' + botID[i] + '_on.src = "' + path + botID[i] + '_on.gif"');
+    };
+
+  };
+
+  // <!--PANCHO-->
+
+  function MM_openBrWindow(theURL,winName,features) { //v2.0
+    window.open(theURL,winName,features);
+  }
+
+  function ima_ck(nom) {
+    var aux = imagidx;
+    imagidx = nom;
+    ima_of(nom);
+    return true;
+  };
+
+  function ima_on(nom) {
+    if (verok == 1) {
+      imgOn = eval("menu_" + nom + "_on.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  function ima_of(nom) {
+    if ((verok == 1) && (imagidx != nom)) {
+      imgOn = eval("menu_" + nom + "_of.src");
+      document[nom].src = imgOn;
+      return true;
+    };
+  };
+
+  // <!--/PANCHO-->
+
+//-->
+</SCRIPT>
+
+</head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<a name="top"></a>
+
+<table width="624" border="0" cellspacing="0" cellpadding="0">
+  <tr align="left" valign="top">
+    <td width="10"><img src="../../imag/auxi/block_transparente.gif" width="10" height="10"></td>
+    <td width="615"><img src="../../imag/auxi/block_transparente.gif" width="10" height="10"></td>
+  </tr>
+  <tr align="left" valign="top">
+    <td width="10"><img src="../../imag/auxi/block_transparente.gif" width="10" height="10"></td>
+    <td width="615">
+      <table width="615" border="0" cellspacing="0" cellpadding="1">
+        <tr bgcolor="#003366">
+          <td>
+      <table width="615" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#003366">
+          <td>
+            <table width="614" border="0" cellspacing="0" cellpadding="0">
+              <tr bgcolor="#FFFFFF" align="left" valign="top">
+                <td>
+                  <table border=0 cellspacing=2 width=614 cellpadding="0">
+                    <tr bgcolor="#FFFFFF">
+                      <td  align=right valign="middle" width="150" bgcolor="#ECEDEE">
+                       <span class="TITULAR">&nbsp;N&deg;
+                        Bolet&iacute;n:&nbsp;&nbsp;</span></td>
+                      <td colspan=3 align=left valign="middle" bgcolor="#f6f6f6"><span class="azu">117-04
+                       </span></td></tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Título:&nbsp;&nbsp;</span></td>
+                      <td colspan=3 align=left bgcolor="#f6f6f6"><span class="TEXTpais">Autoriza el ejercicio profesional a chilenos que obtuvieron grados y títulos que señala, en el exilio. 
+                      </span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                        Fecha de Ingreso:&nbsp;&nbsp;</span></td>
+                      <td colspan=3 align=left valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo">Miércoles 1 de Agosto, 1990</span></td></tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Iniciativa:&nbsp;&nbsp;</span></td>
+                      <td align=left valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">Mensaje</span></td>
+                      <td align=right valign="middle" bgcolor="#ECEDEE" width="120"><span class="TITULAR">
+                        Tipo de proyecto:&nbsp;&nbsp;</span></td>
+                      <td align=left valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">Proyecto de ley</span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="middle" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       C&aacute;mara de origen:&nbsp;&nbsp;</span></td>
+                      <td align=left valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo">C.Diputados </span></td>
+                      <td align=right valign="middle" bgcolor="#ECEDEE" width="120"><span class="TITULAR">
+                       Urgencia actual:&nbsp;&nbsp;</span></td>
+                      <td align=left valign="middle" bgcolor="#f6f6f6" width="170"><span class="TEXTarticulo"></span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">
+                       Etapa:&nbsp;&nbsp;</span></td>
+                      <td colspan=3 align=left valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo">Tramitación terminada</span></td>
+                    </tr>
+                    <tr bgcolor="#FFFFFF">
+                      <td align=right valign="top" width="150" bgcolor="#ECEDEE"><span class="TITULAR">&nbsp;</span></td>
+                      <td colspan=3 align=left valign="middle" bgcolor="#f6f6f6"><span class="TEXTarticulo"><a href="#" onClick="MM_openBrWindow('http://www.leychile.cl/Navegar?idLey=19074&idVersion=1991-08-28','general','scrollbars=yes,width=1024,height=800')">Ley Nº 19.074</a> (D.Oficial: 28/08/91)</span></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+   </td>
+   </tr><tr>
+   <td>
+
+      <table width="615" border="0" cellspacing="0" cellpadding="1">
+        <tr bgcolor="#003366">
+          <td>
+            <table width="613" border="0" cellspacing="0" cellpadding="5">
+              <tr bgcolor="#FFFFFF" align="center" valign="top">
+                <td>
+                  <table width="600" border="0" cellspacing="0" cellpadding="0">
+                    <tr align="center" valign="middle">
+                      <td>
+                        <a href="sil_tramitacion-117-04.html" onMouseOver="ima_on('tra')" onMouseOut="ima_of('tra')"
+                         onClick="ima_ck('tra')" target="cont_if1">
+                        <img src="../../imag/boto/tra_of.gif" width="87" height="14" border="0" name="tra"></a></td>
+                      <td>
+                       <a href="sil_informes.pl?1002,,," onMouseOver="ima_on('inf')" 
+                        onMouseOut="ima_of('inf')" 
+                        onClick="ima_ck('inf')" target="cont_if1">
+                       <img src="../../imag/boto/inf_of.gif" width="69" height="14" border="0" name="inf"></a></td>
+                      <td>
+                       <a href="sil_oficios-117-04.html" onMouseOver="ima_on('ofi')" 
+                        onMouseOut="ima_of('ofi')" onClick="ima_ck('ofi')" target="cont_if1">
+                       <img src="../../imag/boto/ofi_of.gif" width="60" height="14" border="0" name="ofi"></a></td>
+                      <td>
+                       <a href="sil_indicaciones.pl?1002" onMouseOver="ima_on('ind')" 
+                        onMouseOut="ima_of('ind')" onClick="ima_ck('ind')" target="cont_if1">
+                        <img src="../../imag/boto/ind_of.gif" width="91" height="14" border="0" name="ind"></a></td>
+                      <td>
+                       <a href="sil_comparados.pl?1002" onMouseOver="ima_on('com')"
+                        onMouseOut="ima_of('com')" onClick="ima_ck('com')" target="cont_if1">
+                        <img src="../../imag/boto/com_of.gif" width="87" height="14" border="0" name="com"></a></td>
+                      <td>
+                        <a href="sil_urgencias-117-04.html" onMouseOver="ima_on('urg')" onMouseOut="ima_of('urg')" 
+                         onClick="ima_ck('urg')" target="cont_if1">
+                        <img src="../../imag/boto/urg_of.gif" width="75" height="14" border="0" name="urg"></a></td>
+                      <td></td>
+                       <td></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+     
+</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+
+<iframe name="cont_if1" frameborder="0" marginheight="0" width="100%" 
+  height="3000"></iframe>
+</body>
+</html>

@@ -11,6 +11,7 @@ class TestSil < Test::Unit::TestCase
 		@robot.url_tramitacion_base = ''
 		@robot.url_oficios_base = ''
 		@robot.url_urgencias_base = ''
+		@robot.from_where = 1
 		#@robot.lamb = lambda {|proyecto| puts proyecto }
 	end
 	def test_htmlExist
@@ -40,7 +41,7 @@ class TestSil < Test::Unit::TestCase
 		html = file.read
 		abolir_pena_de_muerte_boletin = @robot.procesarUnBoletin(html)
 		expected_title = "Modifica los C\xF3digos de Justicia Militar, Penal y Aeron\xE1utico para abolir la Pena de Muerte."
-		expected_fecha = "Martes 20 de Marzo, 1990"
+		expected_fecha = "Tuesday 20 March, 1990"
 		expected_iniciativa = "Mensaje"
 		expected_camara_origen = "C.Diputados"
 		expected_etapa = "Tramitaci\xF3n terminada"
@@ -72,14 +73,12 @@ class TestSil < Test::Unit::TestCase
 		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
-
 	def test_procesaOficios
 		file = File.open("./test/sil_oficios-1-07.html", "rb")
 		html = file.read
 		oficios = @robot.procesarOficios(html)
 		assert_equal 6, oficios.count
 	end
-
 	def test_procesaUnOficio
 		tr = Nokogiri::XML('<tr align="center"><td width="70" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;116</span></td><td width="80" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTarticulo">&nbsp;27/11/90</span></td><td width="260" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;Oficio rechazo modificaciones a Cámara Revisora</span></td><td width="130" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTarticulo">&nbsp;Tercer trámite constitucional</span></td><td width="73" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;<input type="image" onClick="window.open(\'../../cgi-bin/sil_abredocumentos.pl?3,2410\',\'general\',\'scrollbars=no,width=435,height=300\')" src="../../imag/auxi/mas_texto.gif" border="0" width="22" height="15" alt="Obtener documento"></span></td></tr>', nil, 'utf-8')
 		oficio = @robot.procesaUnOficio(tr.root)
@@ -97,7 +96,6 @@ class TestSil < Test::Unit::TestCase
 		assert oficios[0].has_key?("oficio")
 		assert oficios[0].has_key?("etapa")
 	end
-	
 	def test_procesaUrgencias
 		file = File.open("./test/sil_urgencias-1-07.html", "rb")
 		html = file.read
@@ -119,7 +117,6 @@ class TestSil < Test::Unit::TestCase
 		assert_equal '06/11/90' ,urgencia['fecha_termino']
 		assert_equal '061190' ,urgencia['numero_mensaje_termino']
 	end
-	
 	def test_urgenciasSonDelTipoUrgencia
 		file = File.open("./test/sil_urgencias-1-07.html", "rb")
 		html = file.read
@@ -131,7 +128,6 @@ class TestSil < Test::Unit::TestCase
 		assert urgencias[0].has_key? 'fecha_termino'
 		assert urgencias[0].has_key? 'numero_mensaje_termino'
 	end
-
 	def test_parseaUnaFecha
 		require 'date'
 		fecha = "Miércoles 1 de Agosto, 1990"
@@ -148,5 +144,16 @@ class TestSil < Test::Unit::TestCase
 		fecha = Date.parse fecha
 		assert_equal expected_fecha, fecha.to_s
 	end
+	def test_parseaUnaFechaNula
+		fecha = nil
+		expected_fecha = nil
+		resultado = @robot.parseaUnaFecha fecha
+		assert_nil resultado
+	end
+	def test_procesaProyectoConDiferenteXpath
+		file = File.open("./test/boletin-1127-11", "rb")
+		html = file.read
+		el_diferente = @robot.procesarUnBoletin(html)
+		p el_diferente
+	end
 end
-
