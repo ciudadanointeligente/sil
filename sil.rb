@@ -41,7 +41,7 @@ class SilRobot
 		result
 	end
 	def procesarUnBoletin(html)
-		html = Nokogiri::HTML(html, nil, 'utf-8')
+		html = Nokogiri::HTML(html)
 		boletin  = Hash.new
 		path_base = "/html/body/table//tr[2]/td[2]/table//"
 		path_url = "tr[2]/td/table//tr/td/table//tr/td/table//tr/"

@@ -40,11 +40,11 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/boletin-1-07", "rb")
 		html = file.read
 		abolir_pena_de_muerte_boletin = @robot.procesarUnBoletin(html)
-		expected_title = "Modifica los C\xF3digos de Justicia Militar, Penal y Aeron\xE1utico para abolir la Pena de Muerte."
+		expected_title = "Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte.".encode('ISO-8859-1')
 		expected_fecha = "Tuesday 20 March, 1990"
 		expected_iniciativa = "Mensaje"
 		expected_camara_origen = "C.Diputados"
-		expected_etapa = "Tramitaci\xF3n terminada"
+		expected_etapa = "Tramitación terminada".encode('ISO-8859-1')
 		assert_equal(expected_title, abolir_pena_de_muerte_boletin["title"])
 		assert_equal(expected_fecha, abolir_pena_de_muerte_boletin["fecha_de_ingreso"])
 		assert_equal(expected_iniciativa, abolir_pena_de_muerte_boletin["iniciativa"])
@@ -80,11 +80,14 @@ class TestSil < Test::Unit::TestCase
 		assert_equal 6, oficios.count
 	end
 	def test_procesaUnOficio
-		tr = Nokogiri::XML('<tr align="center"><td width="70" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;116</span></td><td width="80" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTarticulo">&nbsp;27/11/90</span></td><td width="260" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;Oficio rechazo modificaciones a Cámara Revisora</span></td><td width="130" bgcolor="#FFFFFF" valign="top" align="left"><span class="TEXTarticulo">&nbsp;Tercer trámite constitucional</span></td><td width="73" bgcolor="#FFFFFF" align="left" valign="top"><span class="TEXTarticulo">&nbsp;<input type="image" onClick="window.open(\'../../cgi-bin/sil_abredocumentos.pl?3,2410\',\'general\',\'scrollbars=no,width=435,height=300\')" src="../../imag/auxi/mas_texto.gif" border="0" width="22" height="15" alt="Obtener documento"></span></td></tr>', nil, 'utf-8')
+		element = "<tr align=\"center\"><td width=\"70\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;116</span></td><td width=\"80\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\"><span class=\"TEXTarticulo\">&nbsp;27/11/90</span></td><td width=\"260\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;Oficio rechazo modificaciones a Cámara Revisora</span></td><td width=\"130\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\"><span class=\"TEXTarticulo\">&nbsp;Tercer trámite constitucional</span></td><td width=\"73\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;<input type=\"image\" onClick=\"window.open('../../cgi-bin/sil_abredocumentos.pl?3,2410','general','scrollbars=no,width=435,height=300')\" src=\"../../imag/auxi/mas_texto.gif\" border=\"0\" width=\"22\" height=\"15\" alt=\"Obtener documento\"></span></td></tr>"
+		tr = Nokogiri::XML(element)
 		oficio = @robot.procesaUnOficio(tr.root)
 		assert_equal '116', oficio['numero']
 		assert_equal '27/11/90', oficio['fecha']
-		assert_equal 'Oficio rechazo modificaciones a Cámara Revisora', oficio['oficio']
+
+		oficio_texto = 'Oficio rechazo modificaciones a Cámara Revisora'
+		assert_equal oficio_texto , oficio['oficio']
 		assert_equal 'Tercer trámite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
@@ -154,6 +157,6 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/boletin-1127-11", "rb")
 		html = file.read
 		el_diferente = @robot.procesarUnBoletin(html)
-		p el_diferente
+		#p el_diferente
 	end
 end
