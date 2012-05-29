@@ -21,4 +21,4 @@ SIL robot
 
 Fundación Ciudadano Inteligente
 
-http://www.ciudadanointeligente.cl/
+http://www.ciudadanointeligente.org/
