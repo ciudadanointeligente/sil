@@ -4,7 +4,7 @@ require 'nokogiri'
 require 'open-uri'
 
 class SilRobot
-	attr_accessor :html, :base_url, :url_tramitacion_base, :lamb, :proyectos_buffer, :url_oficios_base, :url_urgencias_base
+	attr_accessor :html, :base_url, :url_tramitacion_base, :lamb, :proyectos_buffer, :url_oficios_base, :url_urgencias_base, :from_where
 
 	def initialize(html)
 		@html = html
@@ -14,10 +14,11 @@ class SilRobot
 		@url_urgencias_base = 'http://sil.senado.cl/cgi-bin/'
 		@lamb = lambda {|proyecto, a| a.push(proyecto) }
 		@proyectos_buffer = Array.new
+		@from_where = 1
 	end
 	def procesar
 		doc = Nokogiri::HTML(@html, nil, 'utf-8')
-		doc.xpath('//html/body/table//tr/td/table//tr/td/table//tr[(position()>1)]').each do |tr|
+		doc.xpath('//html/body/table//tr/td/table//tr/td/table//tr[(position()>'+@from_where.to_s+')]').each do |tr|
 			proyecto = procesarUnProyectoDeLey(tr)
 			@lamb.call(proyecto, @proyectos_buffer)
 		end
@@ -44,9 +45,11 @@ class SilRobot
 		boletin  = Hash.new
 		path_base = "/html/body/table//tr[2]/td[2]/table//"
 		path_url = "tr[2]/td/table//tr/td/table//tr/td/table//tr/"
-		path_detalle = "tr/td/table//tr/td/table//tr/td/table//tr"
+		path_detalle = "descendant::*[name() ='tr']/td/table//tr/td/table//tr/td/table//tr"
+
 		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').to_s.strip
 		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').to_s.strip
+		boletin["fecha_de_ingreso"] = parseaUnaFecha(boletin["fecha_de_ingreso"])
 		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').to_s.strip
 		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').to_s.strip
 		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').to_s.strip
@@ -98,7 +101,6 @@ class SilRobot
 	def procesarOficios(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
 		oficios = Array.new
-
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
 			oficios.push(procesaUnOficio(tr))
 		end
@@ -130,27 +132,30 @@ class SilRobot
 		urgencia
 	end
 	def parseaUnaFecha(fecha)
+		if fecha.nil?
+			return
+		end
 		fecha.slice! "de "
 		english_to_spanish = {
-		  'january' => 'Enero',
-		  'february' => 'Febrero',
-		  'march' => 'Marzo',
-		  'april' => 'Abril',
-		  'may' => 'Mayo',
-		  'june' => 'Junio',
-		  'july' => 'Julio',
-		  'august' => 'Agosto',
-		  'september' => 'Septiembre',
-		  'october' => 'Octubre',
-		  'november' => 'Noviembre',
-		  'december' => 'Diciembre',
-		  'monday' => 'Lunes',
-		  'tuesday' => 'Martes',
-		  'wednesday' => 'Miércoles',
-		  'thursday' => 'Jueves',
-		  'friday' => 'Viernes',
-		  'saturday' => 'Sábado',
-		  'sunday' => 'Domingo',
+		  'January' => 'Enero',
+		  'February' => 'Febrero',
+		  'March' => 'Marzo',
+		  'April' => 'Abril',
+		  'May' => 'Mayo',
+		  'June' => 'Junio',
+		  'July' => 'Julio',
+		  'August' => 'Agosto',
+		  'September' => 'Septiembre',
+		  'October' => 'Octubre',
+		  'November' => 'Noviembre',
+		  'December' => 'Diciembre',
+		  'Monday' => 'Lunes',
+		  'Tuesday' => 'Martes',
+		  'Wednesday' => 'Miércoles',
+		  'Thursday' => 'Jueves',
+		  'Friday' => 'Viernes',
+		  'Saturday' => 'Sábado',
+		  'Sunday' => 'Domingo',
 		}
 		english_to_spanish.each do |en, es|
 			fecha.gsub!(/\b#{es}\b/i, en)
@@ -158,4 +163,3 @@ class SilRobot
 		fecha
 	end
 end
-
