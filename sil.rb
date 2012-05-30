@@ -83,7 +83,6 @@ class SilRobot
 		codifica(boletin)
 	end
 	def procesarTramitaciones(html)
-		html = html.gsub('&nbsp;'," ")
 		html = Nokogiri::HTML(html, nil, 'utf-8')
 		tramitaciones  = Array.new
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
