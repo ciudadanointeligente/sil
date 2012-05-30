@@ -3,7 +3,7 @@ require 'rubygems'
 require 'rest-client'
 require './sil'
 
-url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl'
+url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?90'
 #url = 'test/sil_proyectos5.html'	#Use to local testing
 puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 file = open(url)
@@ -33,7 +33,7 @@ robot.lamb = lambda {|proyecto, a| puts proyecto["id"]
 	end
 
 	puts '<---------'
-	p data
+	p proyecto
 	puts '---------->'
 	RestClient.put url, data, {:content_type => :json}
 }

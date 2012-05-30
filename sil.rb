@@ -17,7 +17,7 @@ class SilRobot
 		@from_where = 1
 	end
 	def procesar
-		doc = Nokogiri::HTML(@html, nil, 'utf-8')
+		doc = Nokogiri::HTML(@html)
 		doc.xpath('//html/body/table//tr/td/table//tr/td/table//tr[(position()>'+@from_where.to_s+')]').each do |tr|
 			proyecto = procesarUnProyectoDeLey(tr)
 			@lamb.call(proyecto, @proyectos_buffer)
@@ -47,15 +47,15 @@ class SilRobot
 		path_url = "tr[2]/td/table//tr/td/table//tr/td/table//tr/"
 		path_detalle = "descendant::*[name() ='tr']/td/table//tr/td/table//tr/td/table//tr"
 
-		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').to_s.strip
-		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').to_s.strip
+		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
+		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
 		boletin["fecha_de_ingreso"] = parseaUnaFecha(boletin["fecha_de_ingreso"])
-		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').to_s.strip
-		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').to_s.strip
-		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').to_s.strip
-		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').to_s.strip
-		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').to_s.strip
-		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').to_s.strip
+		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
+		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
+		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
+		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').to_s.force_encoding("utf-8").strip
+		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').to_s.force_encoding("utf-8").strip
+		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').to_s.force_encoding("utf-8").strip
 		begin
 			url = @url_tramitacion_base+boletin["url_tramitacion"]
 			file = open(url)
@@ -80,9 +80,10 @@ class SilRobot
 		rescue Exception=>e
 			# handle e
 		end
-		boletin
+		codifica(boletin)
 	end
 	def procesarTramitaciones(html)
+		html = html.gsub('&nbsp;'," ")
 		html = Nokogiri::HTML(html, nil, 'utf-8')
 		tramitaciones  = Array.new
 		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
@@ -92,11 +93,14 @@ class SilRobot
 	end
 	def procesarUnaTramitacion(tr)
 		tramitacion = Hash.new
-		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").to_s.strip
-		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").to_s.strip
-		tramitacion["subetapa"] = tr.at_xpath("td[3]/span/text()").to_s.strip
-		tramitacion["etapa"] = tr.at_xpath("td[4]/span/text()").to_html.strip
-		tramitacion
+		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").to_s.force_encoding("utf-8").strip
+		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").to_s.force_encoding("utf-8").strip
+		subetapa = tr.at_xpath("td[3]/span/text()").text.force_encoding("utf-8")
+		tramitacion["subetapa"] = subetapa.strip
+		etapa = tr.at_xpath("td[4]/span/text()").text.force_encoding("utf-8")
+
+		tramitacion["etapa"] = etapa.strip
+		codifica(tramitacion)
 	end
 	def procesarOficios(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
@@ -108,11 +112,11 @@ class SilRobot
 	end
 	def procesaUnOficio(tr)
 		oficio = Hash.new
-		oficio['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
-		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").to_s.strip
-		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").to_s.strip
-		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").to_s.strip
-		oficio
+		oficio['numero'] = tr.at_xpath("td[1]/span/text()").to_s.force_encoding("utf-8").strip
+		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").to_s.force_encoding("utf-8").strip
+		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").to_s.force_encoding("utf-8").strip
+		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").to_s.force_encoding("utf-8").strip
+		codifica(oficio)
 	end
 	def procesarUrgencias(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
@@ -124,12 +128,13 @@ class SilRobot
 	end
 	def procesaUnaUrgencia(tr)
 		urgencia = Hash.new
+		val = tr.at_xpath("td[5]/span/text()").text
 		urgencia['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
 		urgencia['fecha_inicio'] = tr.at_xpath("td[2]/span/text()").to_s.strip
 		urgencia['numero_mensaje_ingreso'] = tr.at_xpath("td[3]/span/text()").to_s.strip
 		urgencia['fecha_termino'] = tr.at_xpath("td[4]/span/text()").to_s.strip
 		urgencia['numero_mensaje_termino'] = tr.at_xpath("td[5]/span/text()").to_s.strip
-		urgencia
+		codifica(urgencia)
 	end
 	def parseaUnaFecha(fecha)
 		if fecha.nil?
@@ -162,4 +167,26 @@ class SilRobot
 		end
 		fecha
 	end
+	def codifica(diccionario)
+		diccionario.each do |key, value|
+			if value.class.name == "Hash" || value.class.name == "Array"
+				diccionario[key] = codifica(value)
+			end
+			if value.class.name == "String"
+				value.force_encoding 'Windows-1252'
+				value.encode! 'utf-8'
+				if !value.valid_encoding?
+					p '<--- no valid encoding'
+					p value
+					p 'no valid encoding --->'
+				else
+					value = value.gsub("Â","")
+				end
+				diccionario[key] = value
+
+			end
+		end
+		diccionario
+	end
 end
+	

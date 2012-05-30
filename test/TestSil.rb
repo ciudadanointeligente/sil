@@ -1,6 +1,7 @@
 # coding: utf-8
 require './sil'
 require 'test/unit'
+require 'cgi'
 
 class TestSil < Test::Unit::TestCase
 	def setup
@@ -40,22 +41,23 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/boletin-1-07", "rb")
 		html = file.read
 		abolir_pena_de_muerte_boletin = @robot.procesarUnBoletin(html)
-		expected_title = "Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte.".encode('ISO-8859-1')
+		expected_title = "Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte."
 		expected_fecha = "Tuesday 20 March, 1990"
 		expected_iniciativa = "Mensaje"
 		expected_camara_origen = "C.Diputados"
-		expected_etapa = "Tramitación terminada".encode('ISO-8859-1')
+		expected_etapa = "Tramitación terminada"
 		assert_equal(expected_title, abolir_pena_de_muerte_boletin["title"])
 		assert_equal(expected_fecha, abolir_pena_de_muerte_boletin["fecha_de_ingreso"])
 		assert_equal(expected_iniciativa, abolir_pena_de_muerte_boletin["iniciativa"])
 		assert_equal(expected_camara_origen, abolir_pena_de_muerte_boletin["camara_origen"])
 		assert_equal(expected_etapa, abolir_pena_de_muerte_boletin["etapa"])
-		assert_equal('test/sil_tramitacion-1-07.html', abolir_pena_de_muerte_boletin["url_tramitacion"])
+		assert_equal('./test/sil_tramitacion-1-07.html', abolir_pena_de_muerte_boletin["url_tramitacion"])
 		assert_equal('test/sil_oficios-1-07.html', abolir_pena_de_muerte_boletin["url_oficios"])
 		assert_equal('test/sil_urgencias-1-07.html', abolir_pena_de_muerte_boletin["url_urgencias"])
-		assert abolir_pena_de_muerte_boletin.has_key?("tramitaciones")
-		assert abolir_pena_de_muerte_boletin.has_key?("oficios")
-		assert abolir_pena_de_muerte_boletin.has_key?("urgencias")
+		
+		assert abolir_pena_de_muerte_boletin.has_key?("oficios"), "no pilló los oficios"
+		assert abolir_pena_de_muerte_boletin.has_key?("urgencias"), "no pilló las urgencias"
+		assert abolir_pena_de_muerte_boletin.has_key?("tramitaciones"), "no pilló las tramitaciones"
 	end
 	def test_procesaTramitaciones
 		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
@@ -67,10 +69,10 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
 		html = file.read
 		tramitaciones = @robot.procesarTramitaciones(html)
-		expected_etapa = " Primer tr\xE1mite constitucional / C.Diputados"
-		assert_equal("  /", tramitaciones[0]["sesion"])
-		assert_equal(" 11/03/1990", tramitaciones[0]["fecha"])
-		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
+		expected_etapa = "Primer trámite constitucional / C.Diputados"
+		assert_equal("/", tramitaciones[0]["sesion"])
+		assert_equal("11/03/1990", tramitaciones[0]["fecha"])
+		assert_equal("Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
 	def test_procesaOficios
@@ -80,15 +82,30 @@ class TestSil < Test::Unit::TestCase
 		assert_equal 6, oficios.count
 	end
 	def test_procesaUnOficio
-		element = "<tr align=\"center\"><td width=\"70\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;116</span></td><td width=\"80\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\"><span class=\"TEXTarticulo\">&nbsp;27/11/90</span></td><td width=\"260\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;Oficio rechazo modificaciones a Cámara Revisora</span></td><td width=\"130\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\"><span class=\"TEXTarticulo\">&nbsp;Tercer trámite constitucional</span></td><td width=\"73\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\"><span class=\"TEXTarticulo\">&nbsp;<input type=\"image\" onClick=\"window.open('../../cgi-bin/sil_abredocumentos.pl?3,2410','general','scrollbars=no,width=435,height=300')\" src=\"../../imag/auxi/mas_texto.gif\" border=\"0\" width=\"22\" height=\"15\" alt=\"Obtener documento\"></span></td></tr>"
-		tr = Nokogiri::XML(element)
+		element = "<tr align=\"center\">
+						<td width=\"70\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\">
+								<span class=\"TEXTarticulo\">&nbsp;116</span>
+						</td>
+						<td width=\"80\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\">
+							<span class=\"TEXTarticulo\">&nbsp;27/11/90</span>
+						</td><td width=\"260\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\">
+							<span class=\"TEXTarticulo\">&nbsp;Oficio rechazo modificaciones a Cámara Revisora</span>
+						</td>
+						<td width=\"130\" bgcolor=\"#FFFFFF\" valign=\"top\" align=\"left\">
+							<span class=\"TEXTarticulo\">&nbsp;Tercer trámite constitucional</span>
+						</td>
+						<td width=\"73\" bgcolor=\"#FFFFFF\" align=\"left\" valign=\"top\">
+							<span class=\"TEXTarticulo\">&nbsp;<input type=\"image\" onClick=\"window.open('../../cgi-bin/sil_abredocumentos.pl?3,2410','general','scrollbars=no,width=435,height=300')\" src=\"../../imag/auxi/mas_texto.gif\" border=\"0\" width=\"22\" height=\"15\" alt=\"Obtener documento\"></span>
+						</td>
+					</tr>"
+		tr = Nokogiri::XML(element, nil, 'utf-8')
 		oficio = @robot.procesaUnOficio(tr.root)
 		assert_equal '116', oficio['numero']
 		assert_equal '27/11/90', oficio['fecha']
 
-		oficio_texto = 'Oficio rechazo modificaciones a Cámara Revisora'
+		oficio_texto = "Oficio rechazo modificaciones a C&#xE1;mara Revisora"
 		assert_equal oficio_texto , oficio['oficio']
-		assert_equal 'Tercer trámite constitucional', oficio['etapa']
+		assert_equal 'Tercer tr&#xE1;mite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
 		file = File.open("./test/sil_oficios-1-07.html", "rb")
@@ -159,4 +176,44 @@ class TestSil < Test::Unit::TestCase
 		el_diferente = @robot.procesarUnBoletin(html)
 		#p el_diferente
 	end
+	def test_cambia_codificación
+
+		entrada = Hash.new
+		entrada[:a] = "Modifica los C\xF3digos de Justicia Militar, Penal y Aeron\xE1utico para abolir la Pena de Muerte."
+		#codificado en utf-8 pero con caractéres raros, que nos hacen la vida complicada
+		salida = @robot.codifica(entrada)
+		expected_salida = Hash.new
+		expected_salida[:a] = "Modifica los Códigos de Justicia Militar, Penal y Aeronáutico para abolir la Pena de Muerte."
+
+		assert_equal salida, expected_salida
+
+	end
+	def test_cambia_codificacion_nested_array
+
+		entrada = Hash.new
+		entrada[:a] = "C\xF3digoseron\xE1ut"
+		entrada[:b] = Hash.new
+		entrada[:b][:c] = "\xF3\xE1\xE1"
+		#codificado en utf-8 pero con caractéres raros, que nos hacen la vida complicada
+		salida = @robot.codifica(entrada)
+		expected_salida = Hash.new
+		expected_salida[:a] = "Códigoseronáut"
+		expected_salida[:b] = Hash.new
+		expected_salida[:b][:c] = "óáá"
+
+		assert_equal salida, expected_salida
+	end
+
+	def test_codifica_un_array
+		tramitacion = Hash.new
+		tramitacion["subetapa"] = "\xF3\xE1\xE1"
+
+		expected_tramitacion = Hash.new
+		expected_tramitacion["subetapa"] = "óáá"
+
+		salida = @robot.codifica(tramitacion)
+		assert_equal salida, expected_tramitacion
+
+	end
+
 end

@@ -164,7 +164,7 @@
                   <table width="600" border="0" cellspacing="0" cellpadding="0">
                     <tbody><tr align="center" valign="middle">
                       <td>
-                        <a href="test/sil_tramitacion-1-07.html" onmouseover="ima_on(&#39;tra&#39;)" onmouseout="ima_of(&#39;tra&#39;)" onclick="ima_ck(&#39;tra&#39;)" target="cont_if1">
+                        <a href="./test/sil_tramitacion-1-07.html" onmouseover="ima_on(&#39;tra&#39;)" onmouseout="ima_of(&#39;tra&#39;)" onclick="ima_ck(&#39;tra&#39;)" target="cont_if1">
                         <img src="./boletin-1_07_files/tra_of.gif" width="87" height="14" border="0" name="tra"></a></td>
                       <td>
                        <a href="http://sil.senado.cl/cgi-bin/sil_informes.pl?1252,,," onmouseover="ima_on(&#39;inf&#39;)" onmouseout="ima_of(&#39;inf&#39;)" onclick="ima_ck(&#39;inf&#39;)" target="cont_if1">
