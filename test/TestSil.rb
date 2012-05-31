@@ -69,10 +69,10 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
 		html = file.read
 		tramitaciones = @robot.procesarTramitaciones(html)
-		expected_etapa = "Primer trámite constitucional / C.Diputados"
-		assert_equal("/", tramitaciones[0]["sesion"])
-		assert_equal("11/03/1990", tramitaciones[0]["fecha"])
-		assert_equal("Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
+		expected_etapa = " Primer trámite constitucional / C.Diputados"
+		assert_equal("  /", tramitaciones[0]["sesion"])
+		assert_equal(" 11/03/1990", tramitaciones[0]["fecha"])
+		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
 	def test_procesaOficios
@@ -103,9 +103,9 @@ class TestSil < Test::Unit::TestCase
 		assert_equal '116', oficio['numero']
 		assert_equal '27/11/90', oficio['fecha']
 
-		oficio_texto = "Oficio rechazo modificaciones a C&#xE1;mara Revisora"
+		oficio_texto = "Oficio rechazo modificaciones a Cámara Revisora"
 		assert_equal oficio_texto , oficio['oficio']
-		assert_equal 'Tercer tr&#xE1;mite constitucional', oficio['etapa']
+		assert_equal 'Tercer trámite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
 		file = File.open("./test/sil_oficios-1-07.html", "rb")

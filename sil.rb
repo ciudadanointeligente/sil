@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'rubygems'
 require 'nokogiri'
+require 'rest-client'
 require 'open-uri'
 
 class SilRobot
@@ -12,7 +13,9 @@ class SilRobot
 		@url_tramitacion_base = 'http://sil.senado.cl/cgi-bin/'
 		@url_oficios_base = 'http://sil.senado.cl/cgi-bin/'
 		@url_urgencias_base = 'http://sil.senado.cl/cgi-bin/'
-		@lamb = lambda {|proyecto, a| a.push(proyecto) }
+		@lamb = lambda {|proyecto, a| 
+			a.push(proyecto)
+		}
 		@proyectos_buffer = Array.new
 		@from_where = 1
 	end
@@ -20,6 +23,7 @@ class SilRobot
 		doc = Nokogiri::HTML(@html)
 		doc.xpath('//html/body/table//tr/td/table//tr/td/table//tr[(position()>'+@from_where.to_s+')]').each do |tr|
 			proyecto = procesarUnProyectoDeLey(tr)
+			
 			@lamb.call(proyecto, @proyectos_buffer)
 		end
 		@proyectos_buffer
@@ -47,15 +51,15 @@ class SilRobot
 		path_url = "tr[2]/td/table//tr/td/table//tr/td/table//tr/"
 		path_detalle = "descendant::*[name() ='tr']/td/table//tr/td/table//tr/td/table//tr"
 
-		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
-		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
+		boletin["title"] = html.at_xpath(path_base+path_detalle+'[2]/td[2]/span/text()').text.strip
+		boletin["fecha_de_ingreso"] = html.at_xpath(path_base+path_detalle+'[3]/td[2]/span/text()').text.strip
 		boletin["fecha_de_ingreso"] = parseaUnaFecha(boletin["fecha_de_ingreso"])
-		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
-		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
-		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').to_s.force_encoding("utf-8").strip
-		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').to_s.force_encoding("utf-8").strip
-		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').to_s.force_encoding("utf-8").strip
-		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').to_s.force_encoding("utf-8").strip
+		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').text.strip
+		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').text.strip
+		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').text.strip
+		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').text.strip
+		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').text.strip
+		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').text.strip
 		begin
 			url = @url_tramitacion_base+boletin["url_tramitacion"]
 			file = open(url)
@@ -80,7 +84,8 @@ class SilRobot
 		rescue Exception=>e
 			# handle e
 		end
-		codifica(boletin)
+
+		boletin
 	end
 	def procesarTramitaciones(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
@@ -92,11 +97,11 @@ class SilRobot
 	end
 	def procesarUnaTramitacion(tr)
 		tramitacion = Hash.new
-		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").to_s.force_encoding("utf-8").strip
-		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").to_s.force_encoding("utf-8").strip
-		subetapa = tr.at_xpath("td[3]/span/text()").text.force_encoding("utf-8")
+		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").text.strip
+		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").text.strip
+		subetapa = tr.at_xpath("td[3]/span/text()").text
 		tramitacion["subetapa"] = subetapa.strip
-		etapa = tr.at_xpath("td[4]/span/text()").text.force_encoding("utf-8")
+		etapa = tr.at_xpath("td[4]/span/text()").text
 
 		tramitacion["etapa"] = etapa.strip
 		codifica(tramitacion)
@@ -111,10 +116,10 @@ class SilRobot
 	end
 	def procesaUnOficio(tr)
 		oficio = Hash.new
-		oficio['numero'] = tr.at_xpath("td[1]/span/text()").to_s.force_encoding("utf-8").strip
-		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").to_s.force_encoding("utf-8").strip
-		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").to_s.force_encoding("utf-8").strip
-		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").to_s.force_encoding("utf-8").strip
+		oficio['numero'] = tr.at_xpath("td[1]/span/text()").text.strip
+		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").text.strip
+		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").text.strip
+		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").text.strip
 		codifica(oficio)
 	end
 	def procesarUrgencias(html)
@@ -189,3 +194,39 @@ class SilRobot
 	end
 end
 	
+
+
+
+
+
+
+
+if (!defined? test and !test)
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?90'
+	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
+	file = open(url)
+	puts '2/3 Descarga terminada'
+	html = file.read
+	robot = SilRobot.new(html)
+	robot.from_where = 1
+	robot.lamb = lambda {|proyecto, a| puts proyecto["id"]
+		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
+		a.push(proyecto)
+		data = {
+			:stage => proyecto["etapa"],
+			:origin_chamber => proyecto["camara_origen"],
+			:id => proyecto['id'],
+			:title => proyecto["title"],
+			:creation_date => proyecto["fecha_de_ingreso"],
+			:initiative => proyecto["iniciativa"],
+		}
+		RestClient.put url, data, {:content_type => :json}
+	}
+
+	resultado = robot.procesar
+	puts '3/3 Terminado'
+end
+
+
+
