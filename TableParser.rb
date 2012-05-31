@@ -12,12 +12,12 @@ class TableParser
 	def process
 		doc = Nokogiri::HTML(@html, nil, 'utf-8')
 		doc.xpath('//*[@id="contentTopI"]/div[1]/div[2]/table//tr[(position()>2)]').each do |tr|
-			session = process_a_session(tr)
+			session = get_table(tr)
 			@lamb.call(session, @session_buffer)
 		end
 		@session_buffer
 	end
-	def process_a_session(tr)
+	def get_table(tr)
 		url = tr.at_xpath('td[5]/a/@href').to_html.strip
 		begin
 			file = open(url)
@@ -29,11 +29,14 @@ class TableParser
 		result
 	end
 	def get_bills(table_html = @html)
-		bills = table_html.scan(/\(Bolet.*\)/)
-		bill_num = []
+		bills = table_html.scan(/\(.*Bolet(.*\d*\.{0,1}\d+-\d+)*.*\)/).flatten
+		bill_nums = Array.new
 		for bill in bills
-			bill_num.push(bill.scan(/\d*\.{0}\d+-\d+/))
+			for bill_num_array in bill.scan(/(\d{0,3})[^0-9]*(\d{0,3})[^0-9]*(\d{1,3})[^0-9]*(-)[^0-9]*(\d{2})/)
+				bill_num = bill_num_array.join
+				bill_nums.push(bill_num)
+			end
 		end
-		bill_num
+		bill_nums.flatten
 	end
 end
