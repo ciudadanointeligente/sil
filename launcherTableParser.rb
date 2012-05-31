@@ -14,8 +14,10 @@ robot.lamb = lambda {|session, a| puts session["id"]
 	url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
 
 	data = {
-		:legislatura => session["legislatura"],
-		:nro_sesion => session["nro_sesion"],
+		:date => session["date"],
+		:chamber => session["chamber"],
+		:legislature => session["legislature"],
+		:session => session["session"],
 	}
 
 	puts '<---------'
