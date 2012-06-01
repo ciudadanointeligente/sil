@@ -120,6 +120,7 @@ class SilRobot
 		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").text.strip
 		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").text.strip
 		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").text.strip
+		
 		codifica(oficio)
 	end
 	def procesarUrgencias(html)
@@ -196,12 +197,7 @@ end
 	
 
 
-
-
-
-
-
-if (!defined? test and !test)
+if !(defined? Test::Unit::TestCase)
 	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?90'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
@@ -209,7 +205,7 @@ if (!defined? test and !test)
 	html = file.read
 	robot = SilRobot.new(html)
 	robot.from_where = 1
-	robot.lamb = lambda {|proyecto, a| puts proyecto["id"]
+	robot.lamb = lambda {|proyecto, a|
 		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
@@ -221,6 +217,9 @@ if (!defined? test and !test)
 			:creation_date => proyecto["fecha_de_ingreso"],
 			:initiative => proyecto["iniciativa"],
 		}
+		p '<<<<<-----proyecto id :'+ proyecto["id"]
+		p proyecto
+		p '----->>>>>'
 		RestClient.put url, data, {:content_type => :json}
 	}
 

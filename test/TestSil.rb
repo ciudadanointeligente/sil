@@ -1,7 +1,9 @@
 # coding: utf-8
-require './sil'
+
 require 'test/unit'
 require 'cgi'
+require './sil'
+
 
 class TestSil < Test::Unit::TestCase
 	def setup
