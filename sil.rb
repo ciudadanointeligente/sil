@@ -5,7 +5,7 @@ require 'rest-client'
 require 'open-uri'
 
 class SilRobot
-	attr_accessor :html, :base_url, :url_tramitacion_base, :lamb, :proyectos_buffer, :url_oficios_base, :url_urgencias_base, :from_where
+	attr_accessor :html, :base_url, :url_tramitacion_base, :lamb, :proyectos_buffer, :url_oficios_base, :url_urgencias_base, :from_where, :url_autores_base
 
 	def initialize(html)
 		@html = html
@@ -13,6 +13,7 @@ class SilRobot
 		@url_tramitacion_base = 'http://sil.senado.cl/cgi-bin/'
 		@url_oficios_base = 'http://sil.senado.cl/cgi-bin/'
 		@url_urgencias_base = 'http://sil.senado.cl/cgi-bin/'
+		@url_autores_base = 'http://sil.senado.cl/cgi-bin/'
 		@lamb = lambda {|proyecto, a| 
 			a.push(proyecto)
 		}
@@ -60,6 +61,19 @@ class SilRobot
 		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').text.strip
 		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').text.strip
 		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').text.strip
+		url_autores = html.at_xpath('//td[7]/a/@href')
+		if !url_autores.nil?
+			boletin["url_autores"] = url_autores.text.strip
+			begin
+				url = @url_autores_base+boletin["url_autores"]
+				file = open(url)
+				html = file.read
+				boletin["autores"] = procesaAutores(html)
+			rescue Exception=>e
+				# handle e
+			end
+		end
+		
 		begin
 			url = @url_tramitacion_base+boletin["url_tramitacion"]
 			file = open(url)
@@ -133,7 +147,7 @@ class SilRobot
 	end
 	def procesaUnaUrgencia(tr)
 		urgencia = Hash.new
-		val = tr.at_xpath("td[5]/span/text()").text
+		val = tr.at_xpath("td[5]/span/text()").to_s
 		urgencia['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
 		urgencia['fecha_inicio'] = tr.at_xpath("td[2]/span/text()").to_s.strip
 		urgencia['numero_mensaje_ingreso'] = tr.at_xpath("td[3]/span/text()").to_s.strip
@@ -185,7 +199,9 @@ class SilRobot
 					p value
 					p 'no valid encoding --->'
 				else
-					value = value.gsub("Â","")
+					value = value.gsub('Â', '')
+					value = value.gsub(/\\xA0|\\xC2/, '')
+					value.strip!
 				end
 				diccionario[key] = value
 
@@ -193,12 +209,26 @@ class SilRobot
 		end
 		diccionario
 	end
+	def procesaAutores(html)
+		html = Nokogiri::HTML(html, nil, 'utf-8')
+		autores = Array.new
+		html.xpath('//tr[contains(@align, \'center\') and (position()>2)]').each do |tr|
+			autores.push(procesaUnAutor(tr))
+		end
+		autores
+	end
+	def procesaUnAutor(tr)
+		autor = Hash.new
+		autor['nombre'] = tr.at_xpath("td/span[contains(@class,'TEXTarticulo')]/text()").to_s
+		codifica(autor)
+
+	end
 end
 	
 
 
 if !(defined? Test::Unit::TestCase)
-	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?90'
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
 	puts '2/3 Descarga terminada'
@@ -209,6 +239,12 @@ if !(defined? Test::Unit::TestCase)
 		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
+		nombres_en_plano = Array.new
+		if !proyecto['autores'].nil?
+			proyecto['autores'].each do |author|
+				nombres_en_plano.push(author['nombre'].strip)
+			end
+		end
 		data = {
 			:stage => proyecto["etapa"],
 			:origin_chamber => proyecto["camara_origen"],
@@ -216,10 +252,12 @@ if !(defined? Test::Unit::TestCase)
 			:title => proyecto["title"],
 			:creation_date => proyecto["fecha_de_ingreso"],
 			:initiative => proyecto["iniciativa"],
+			:authors => nombres_en_plano.join('|')
 		}
 		p '<<<<<-----proyecto id :'+ proyecto["id"]
-		p proyecto
+		p data
 		p '----->>>>>'
+		
 		RestClient.put url, data, {:content_type => :json}
 	}
 

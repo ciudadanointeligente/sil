@@ -14,6 +14,7 @@ class TestSil < Test::Unit::TestCase
 		@robot.url_tramitacion_base = ''
 		@robot.url_oficios_base = ''
 		@robot.url_urgencias_base = ''
+		@robot.url_autores_base = ''
 		@robot.from_where = 1
 		#@robot.lamb = lambda {|proyecto| puts proyecto }
 	end
@@ -216,6 +217,36 @@ class TestSil < Test::Unit::TestCase
 		salida = @robot.codifica(tramitacion)
 		assert_equal salida, expected_tramitacion
 
+	end
+
+	def test_obtiene_autores
+		file = File.open("./test/sil_autores-8025-07.html", "rb")
+		html = file.read
+		autores = @robot.procesaAutores html
+		assert_equal 10, autores.count
+	end
+	def test_el_autor_es_de_tipo_autor
+		file = File.open("./test/sil_autores-8025-07.html", "rb")
+		html = file.read
+		autores = @robot.procesaAutores html
+		assert_equal ' Auth Stewart, Pepe', autores[0]['nombre']
+
+	end
+
+	def test_obtiene_distintos_autores
+		file = File.open("./test/sil_autores-8025-07.html", "rb")
+		html = file.read
+		autores = @robot.procesaAutores html
+		assert_equal ' Campos Jara, Cristián', autores[1]['nombre']
+	end
+	def test_procesar_un_proyecto_contiene_autores
+		file = File.open("./test/boletin-8025-07", "rb")
+		html = file.read
+		boletin = @robot.procesarUnBoletin(html)
+		assert_equal('./test/sil_autores-8025-07.html', boletin["url_autores"])
+		
+		assert boletin.has_key?("autores"), "no pilló los autores"
+		assert_equal ' Auth Stewart, Pepe',boletin['autores'][0]['nombre']
 	end
 
 end
