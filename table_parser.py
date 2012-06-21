@@ -2,9 +2,10 @@ import re
 import urllib
 import MLStripper
 	
-def main():
+def py_parser(html):
 	#get html from url
-	file = urllib.urlopen("http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=getDoctoSesion&iddocto=35414")
+	#file = urllib.urlopen("http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=getDoctoSesion&iddocto=35414")
+	file = urllib.urlopen(html)
 	html = ""
 	for line in file:
 		html += line
@@ -53,4 +54,4 @@ def date_sp_2_en(date):
 	return en_date
 
 if __name__ == '__main__':
-	main()
+	py_parser()
