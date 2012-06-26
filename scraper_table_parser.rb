@@ -48,7 +48,6 @@ class TableParserRobot
 		session = Hash.new
 		#exec python script
 		table_values = %x[python table_parser.py '#{url}'].gsub(/\n/,' ')
-		#puts 'table_values: '+table_values
 
 		if !(table_values.match(/skipped/))
 			session['session'] = table_values.scan(/session: (\d*)/).flatten[0]
@@ -80,9 +79,11 @@ if !(defined? Test::Unit::TestCase)
 				:legislature => session['legislature'],
 				:session => session['session']
 			}
-			#puts '<------------'
-			#p data
+			#TODO: adds table id to each bill (bill collection) using POST operation
+
 			#puts '------------>'
+			#p data
+			#puts '<------------'
 			RestClient.put url, data, {:content_type => :json}
 		end
 	}
