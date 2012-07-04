@@ -242,7 +242,7 @@ if !(defined? Test::Unit::TestCase)
 	robot = SilRobot.new(html)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
-		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+		url = 'http://localhost:9393/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
@@ -277,7 +277,7 @@ if !(defined? Test::Unit::TestCase)
 			}
 			events[events_counter.to_s.to_sym] = the_event
 			events_counter += 1
-		en
+		end
 
 		data = {
 			:stage => proyecto["etapa"],
