@@ -179,7 +179,7 @@ class TestSil < Test::Unit::TestCase
 		el_diferente = @robot.procesarUnBoletin(html)
 		#p el_diferente
 	end
-	def test_cambia_codificación
+	def test_cambia_codificacion
 
 		entrada = Hash.new
 		entrada[:a] = "Modifica los C\xF3digos de Justicia Militar, Penal y Aeron\xE1utico para abolir la Pena de Muerte."
@@ -247,6 +247,14 @@ class TestSil < Test::Unit::TestCase
 		
 		assert boletin.has_key?("autores"), "no pilló los autores"
 		assert_equal ' Auth Stewart, Pepe',boletin['autores'][0]['nombre']
+	end
+
+	def test_obtiene_urgencia_actual
+		file = File.open("./test/boletin-8025-07", "rb")
+		html = file.read
+		boletin = @robot.procesarUnBoletin(html)
+		expected_urgencia_actual = "Sin urgencia"
+		assert_equal expected_urgencia_actual, boletin['urgencia_actual']
 	end
 
 end

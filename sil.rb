@@ -58,7 +58,13 @@ class SilRobot
 		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').text.strip
 		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').text.strip
 		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').text.strip
+		if !html.at_xpath(path_base+path_detalle+'[5]/td[4]/span/text()').nil?
+			boletin["urgencia_actual"] = html.at_xpath(path_base+path_detalle+'[5]/td[4]/span/text()').text.strip
+		else
+			boletin["urgencia_actual"] = ""
+		end
 		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').text.strip
+
 		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').text.strip
 		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').text.strip
 		url_autores = html.at_xpath('//td[7]/a/@href')
@@ -228,7 +234,7 @@ end
 
 
 if !(defined? Test::Unit::TestCase)
-	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl'
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
 	puts '2/3 Descarga terminada'
@@ -245,6 +251,34 @@ if !(defined? Test::Unit::TestCase)
 				nombres_en_plano.push(author['nombre'].strip)
 			end
 		end
+		events = Hash.new
+		events_counter = 0
+		proyecto["tramitaciones"].each do |tramitacion|
+			the_event = {
+				"session" => tramitacion["sesion"],
+				"start_date" => tramitacion["fecha"],
+				"end_date" => tramitacion["fecha"],
+				"stage" => tramitacion["etapa"],
+				"sub_stage" => tramitacion["subetapa"],
+				"type" => "Tramitación"
+			}
+			events[events_counter.to_s.to_sym] = the_event
+			events_counter += 1
+		end
+
+		proyecto["urgencias"].each do |urgencia|
+			the_event = {
+				"number" => urgencia['numero'],
+				"start_date" => urgencia['fecha_inicio'],
+				"end_date" => urgencia['fecha_termino'],
+				"number_message_start" => urgencia['numero_mensaje_ingreso'],
+				"number_message_start" => urgencia['numero_mensaje_termino'],
+				"type" => "Urgencia"
+			}
+			events[events_counter.to_s.to_sym] = the_event
+			events_counter += 1
+		en
+
 		data = {
 			:stage => proyecto["etapa"],
 			:origin_chamber => proyecto["camara_origen"],
@@ -252,18 +286,27 @@ if !(defined? Test::Unit::TestCase)
 			:title => proyecto["title"],
 			:creation_date => proyecto["fecha_de_ingreso"],
 			:initiative => proyecto["iniciativa"],
-			:authors => nombres_en_plano.join('|')
+			:authors => nombres_en_plano,
+			:current_urgency => proyecto["urgencia_actual"],
+			:events => events
+
 		}
 		p '<<<<<-----proyecto id :'+ proyecto["id"]
 		p data
 		p '----->>>>>'
 		
 		RestClient.put url, data, {:content_type => :json}
+
+
+
+
+
 	}
 
 	resultado = robot.procesar
 	puts '3/3 Terminado'
+
+
+
 end
-
-
 
