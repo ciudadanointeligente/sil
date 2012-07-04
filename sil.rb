@@ -242,7 +242,7 @@ if !(defined? Test::Unit::TestCase)
 	robot = SilRobot.new(html)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
-		url = 'http://localhost:9393/bills'
+		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
