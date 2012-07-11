@@ -120,6 +120,12 @@ class SilRobot
 		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").text.strip
 		fecha = tr.at_xpath("td[2]/span/text()").text.strip
                 fecha.gsub!(" ","")
+                begin
+                    fecha = Date.strptime(fecha, "%d/%m/%Y").to_s
+                rescue e
+
+                    fecha = nil
+                end
                 tramitacion["fecha"] = fecha
                 
 		subetapa = tr.at_xpath("td[3]/span/text()").text
@@ -160,10 +166,20 @@ class SilRobot
 		urgencia['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
                 fecha_inicio = tr.at_xpath("td[2]/span/text()").to_s.strip
                 fecha_inicio.gsub!(" ","")
+                begin
+                    fecha_inicio = Date.strptime(fecha_inicio, "%d/%m/%Y").to_s
+                rescue e
+                    fecha_inicio = nil
+                end
 		urgencia['fecha_inicio'] = fecha_inicio
 		urgencia['numero_mensaje_ingreso'] = tr.at_xpath("td[3]/span/text()").to_s.strip
                 fecha_termino = tr.at_xpath("td[4]/span/text()").to_s.strip
                 fecha_termino.gsub!(" ","")
+                begin
+                    fecha_termino = Date.strptime(fecha_termino,"%d/%m/%Y").to_s
+                rescue
+                    fecha_termino = nil
+                end
 		urgencia['fecha_termino'] = fecha_termino
 		urgencia['numero_mensaje_termino'] = tr.at_xpath("td[5]/span/text()").to_s.strip
 		codifica(urgencia)
