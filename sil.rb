@@ -118,7 +118,10 @@ class SilRobot
 	def procesarUnaTramitacion(tr)
 		tramitacion = Hash.new
 		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").text.strip
-		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").text.strip
+		fecha = tr.at_xpath("td[2]/span/text()").text.strip
+                fecha.gsub!(" ","")
+                tramitacion["fecha"] = fecha
+                
 		subetapa = tr.at_xpath("td[3]/span/text()").text
 		tramitacion["subetapa"] = subetapa.strip
 		etapa = tr.at_xpath("td[4]/span/text()").text
@@ -155,9 +158,13 @@ class SilRobot
 		urgencia = Hash.new
 		val = tr.at_xpath("td[5]/span/text()").to_s
 		urgencia['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
-		urgencia['fecha_inicio'] = tr.at_xpath("td[2]/span/text()").to_s.strip
+                fecha_inicio = tr.at_xpath("td[2]/span/text()").to_s.strip
+                fecha_inicio.gsub!(" ","")
+		urgencia['fecha_inicio'] = fecha_inicio
 		urgencia['numero_mensaje_ingreso'] = tr.at_xpath("td[3]/span/text()").to_s.strip
-		urgencia['fecha_termino'] = tr.at_xpath("td[4]/span/text()").to_s.strip
+                fecha_termino = tr.at_xpath("td[4]/span/text()").to_s.strip
+                fecha_termino.gsub!(" ","")
+		urgencia['fecha_termino'] = fecha_termino
 		urgencia['numero_mensaje_termino'] = tr.at_xpath("td[5]/span/text()").to_s.strip
 		codifica(urgencia)
 	end
@@ -248,7 +255,9 @@ if !(defined? Test::Unit::TestCase)
 		nombres_en_plano = Array.new
 		if !proyecto['autores'].nil?
 			proyecto['autores'].each do |author|
-				nombres_en_plano.push(author['nombre'].strip)
+                                nombre = author['nombre'].strip
+                                nombre.gsub!(" ","")
+				nombres_en_plano.push(nombre)
 			end
 		end
 		events = Hash.new
