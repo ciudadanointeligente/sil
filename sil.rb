@@ -260,7 +260,7 @@ end
 
 
 if !(defined? Test::Unit::TestCase)
-	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?802'
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
 	puts '2/3 Descarga terminada'
@@ -268,8 +268,8 @@ if !(defined? Test::Unit::TestCase)
 	robot = SilRobot.new(html)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
-		#url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
-                url = 'http://localhost:9393/bills'
+		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+        #url = 'http://localhost:9393/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
