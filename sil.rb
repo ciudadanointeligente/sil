@@ -324,7 +324,7 @@ if !(defined? Test::Unit::TestCase)
 		p data
 		p '----->>>>>'
 		
-#		RestClient.put url, data, {:content_type => :json}
+		RestClient.put url, data, {:content_type => :json}
 
 
 
