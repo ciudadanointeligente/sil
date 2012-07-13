@@ -87,6 +87,7 @@ class SilRobot
 			boletin["tramitaciones"] = procesarTramitaciones(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["tramitaciones"] = Array.new
 		end
 		begin
 			url = @url_oficios_base+boletin["url_oficios"]
@@ -95,6 +96,7 @@ class SilRobot
 			boletin["oficios"] = procesarOficios(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["oficios"] = Array.new
 		end
 		begin
 			url = @url_urgencias_base+boletin["url_urgencias"]
@@ -103,6 +105,7 @@ class SilRobot
 			boletin["urgencias"] = procesarUrgencias(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["urgencias"] = Array.new
 		end
 
 		boletin
@@ -167,8 +170,8 @@ class SilRobot
                 fecha_inicio = tr.at_xpath("td[2]/span/text()").to_s.strip
                 fecha_inicio.gsub!(" ","")
                 begin
-                    fecha_inicio = Date.strptime(fecha_inicio, "%d/%m/%Y").to_s
-                rescue e
+                    fecha_inicio = Date.strptime(fecha_inicio, "%d/%m/%y").to_s
+                rescue
                     fecha_inicio = nil
                 end
 		urgencia['fecha_inicio'] = fecha_inicio
@@ -176,7 +179,7 @@ class SilRobot
                 fecha_termino = tr.at_xpath("td[4]/span/text()").to_s.strip
                 fecha_termino.gsub!(" ","")
                 begin
-                    fecha_termino = Date.strptime(fecha_termino,"%d/%m/%Y").to_s
+                    fecha_termino = Date.strptime(fecha_termino,"%d/%m/%y").to_s
                 rescue
                     fecha_termino = nil
                 end
@@ -257,7 +260,7 @@ end
 
 
 if !(defined? Test::Unit::TestCase)
-	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?'
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?802'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
 	puts '2/3 Descarga terminada'
@@ -265,7 +268,8 @@ if !(defined? Test::Unit::TestCase)
 	robot = SilRobot.new(html)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
-		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+		#url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+                url = 'http://localhost:9393/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
@@ -320,7 +324,7 @@ if !(defined? Test::Unit::TestCase)
 		p data
 		p '----->>>>>'
 		
-		RestClient.put url, data, {:content_type => :json}
+#		RestClient.put url, data, {:content_type => :json}
 
 
 

@@ -74,7 +74,7 @@ class TestSil < Test::Unit::TestCase
 		tramitaciones = @robot.procesarTramitaciones(html)
 		expected_etapa = " Primer trámite constitucional / C.Diputados"
 		assert_equal("  /", tramitaciones[0]["sesion"])
-		assert_equal(" 11/03/1990", tramitaciones[0]["fecha"])
+		assert_equal("1990-03-11", tramitaciones[0]["fecha"])
 		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
@@ -135,9 +135,9 @@ class TestSil < Test::Unit::TestCase
          </tr>', nil, 'utf-8')
 		urgencia = @robot.procesaUnaUrgencia(tr.root)
 		assert_equal 'Simple' ,urgencia['numero']
-		assert_equal '03/10/90' ,urgencia['fecha_inicio']
+		assert_equal '1990-10-03' ,urgencia['fecha_inicio']
 		assert_equal '031090' ,urgencia['numero_mensaje_ingreso']
-		assert_equal '06/11/90' ,urgencia['fecha_termino']
+		assert_equal '1990-11-06' ,urgencia['fecha_termino']
 		assert_equal '061190' ,urgencia['numero_mensaje_termino']
 	end
 	def test_urgenciasSonDelTipoUrgencia
