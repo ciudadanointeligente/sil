@@ -68,14 +68,26 @@ class TestSil < Test::Unit::TestCase
 		tramitaciones = @robot.procesarTramitaciones(html)
 		assert_equal(2, tramitaciones.count)
 	end
+
+	def test_obtieneElLinkAlProyectoDeLey
+		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
+		html = file.read
+		link = @robot.obtieneElLinkAlProyectoDeLey(html)
+
+		assert_equal "http://sil.congreso.cl/docsil/proy1252.doc",link
+
+
+	end
+
+
 	def test_primerTramite
 		file = File.open("./test/sil_tramitacion-1-07.html", "rb")
 		html = file.read
 		tramitaciones = @robot.procesarTramitaciones(html)
-		expected_etapa = " Primer trámite constitucional / C.Diputados"
-		assert_equal("  /", tramitaciones[0]["sesion"])
+		expected_etapa = "Primer trámite constitucional / C.Diputados"
+		assert_equal(" /", tramitaciones[0]["sesion"])
 		assert_equal("1990-03-11", tramitaciones[0]["fecha"])
-		assert_equal(" Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
+		assert_equal("Ingreso de proyecto  .", tramitaciones[0]["subetapa"])
 		assert_equal(expected_etapa, tramitaciones[0]["etapa"])	
 	end
 	def test_procesaOficios
@@ -107,7 +119,7 @@ class TestSil < Test::Unit::TestCase
 		assert_equal '27/11/90', oficio['fecha']
 
 		oficio_texto = "Oficio rechazo modificaciones a Cámara Revisora"
-		assert_equal oficio_texto , oficio['oficio']
+		assert_equal oficio_texto, oficio['oficio']
 		assert_equal 'Tercer trámite constitucional', oficio['etapa']
 	end
 	def test_oficiosSonDelTipoOficio
@@ -229,7 +241,7 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/sil_autores-8025-07.html", "rb")
 		html = file.read
 		autores = @robot.procesaAutores html
-		assert_equal ' Auth Stewart, Pepe', autores[0]['nombre']
+		assert_equal 'Auth Stewart, Pepe', autores[0]['nombre']
 
 	end
 
@@ -237,7 +249,7 @@ class TestSil < Test::Unit::TestCase
 		file = File.open("./test/sil_autores-8025-07.html", "rb")
 		html = file.read
 		autores = @robot.procesaAutores html
-		assert_equal ' Campos Jara, Cristián', autores[1]['nombre']
+		assert_equal 'Campos Jara, Cristián', autores[1]['nombre']
 	end
 	def test_procesar_un_proyecto_contiene_autores
 		file = File.open("./test/boletin-8025-07", "rb")
@@ -246,7 +258,7 @@ class TestSil < Test::Unit::TestCase
 		assert_equal('./test/sil_autores-8025-07.html', boletin["url_autores"])
 		
 		assert boletin.has_key?("autores"), "no pilló los autores"
-		assert_equal ' Auth Stewart, Pepe',boletin['autores'][0]['nombre']
+		assert_equal 'Auth Stewart, Pepe',boletin['autores'][0]['nombre']
 	end
 
 	def test_obtiene_urgencia_actual

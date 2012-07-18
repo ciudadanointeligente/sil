@@ -89,6 +89,15 @@ class SilRobot
 			# handle e
                         boletin["tramitaciones"] = Array.new
 		end
+
+		begin
+			url = @url_tramitacion_base+boletin["url_tramitacion"]
+			file = open(url)
+			html = file.read
+			boletin["link_al_proyecto_de_ley"] = obtieneElLinkAlProyectoDeLey(html)
+		rescue Exception=>e
+			
+		end
 		begin
 			url = @url_oficios_base+boletin["url_oficios"]
 			file = open(url)
@@ -118,6 +127,27 @@ class SilRobot
 		end
 		tramitaciones
 	end
+
+	def obtieneElLinkAlProyectoDeLey(html)
+		html = Nokogiri::HTML(html, nil, 'utf-8')
+		tramitaciones  = Array.new
+		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
+			subetapa = tr.at_xpath("td[3]/span/text()").text
+			if subetapa.include? "Ingreso de proyecto"
+				begin
+					id_doc = tr.at_xpath("td[5]/span/input")["onclick"].match(/\d*,(\d*)/)[1]
+					return "http://sil.congreso.cl/docsil/proy"+id_doc+".doc"
+				rescue Exception=>e
+					p "no pude sacar el proyecto de ley pero la traté de sacar de aquí"
+					p tr.at_xpath("td[5]/span/input")["onclick"]
+
+				end
+				
+			end
+
+		end
+	end
+
 	def procesarUnaTramitacion(tr)
 		tramitacion = Hash.new
 		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").text.strip
@@ -134,9 +164,14 @@ class SilRobot
 		subetapa = tr.at_xpath("td[3]/span/text()").text
 		tramitacion["subetapa"] = subetapa.strip
 		etapa = tr.at_xpath("td[4]/span/text()").text
-
 		tramitacion["etapa"] = etapa.strip
-		codifica(tramitacion)
+
+		tramitacion = codifica(tramitacion)
+		tramitacion["etapa"].gsub!(" ","")
+		tramitacion["subetapa"].gsub!(" ","")
+		tramitacion["sesion"].gsub!(" ","")
+
+		tramitacion
 	end
 	def procesarOficios(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
@@ -152,7 +187,9 @@ class SilRobot
 		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").text.strip
 		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").text.strip
 		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").text.strip
-		
+		if oficio['oficio'].valid_encoding?
+			return oficio
+		end
 		codifica(oficio)
 	end
 	def procesarUrgencias(html)
@@ -252,7 +289,10 @@ class SilRobot
 	def procesaUnAutor(tr)
 		autor = Hash.new
 		autor['nombre'] = tr.at_xpath("td/span[contains(@class,'TEXTarticulo')]/text()").to_s
-		codifica(autor)
+		autor = codifica(autor)
+		autor['nombre'].gsub!(" ","")
+		autor 
+		
 
 	end
 end
@@ -260,7 +300,7 @@ end
 
 
 if !(defined? Test::Unit::TestCase)
-	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl?'
+	url = 'http://sil.senado.cl/cgi-bin/sil_proyectos.pl'
 	puts '1/3 Descargando el listado de proyectos desde sil.senado.cl...'
 	file = open(url)
 	puts '2/3 Descarga terminada'
@@ -269,7 +309,7 @@ if !(defined? Test::Unit::TestCase)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
 		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
-        #url = 'http://localhost:9393/bills'
+        #url = 'http://localhost:8080/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
@@ -280,7 +320,7 @@ if !(defined? Test::Unit::TestCase)
 				nombres_en_plano.push(nombre)
 			end
 		end
-		events = Hash.new
+		events = Array.new
 		events_counter = 0
 		proyecto["tramitaciones"].each do |tramitacion|
 			the_event = {
@@ -291,7 +331,7 @@ if !(defined? Test::Unit::TestCase)
 				"sub_stage" => tramitacion["subetapa"],
 				"type" => "Tramitación"
 			}
-			events[events_counter.to_s.to_sym] = the_event
+			events.push the_event
 			events_counter += 1
 		end
 
@@ -304,9 +344,27 @@ if !(defined? Test::Unit::TestCase)
 				"number_message_start" => urgencia['numero_mensaje_termino'],
 				"type" => "Urgencia"
 			}
-			events[events_counter.to_s.to_sym] = the_event
+			events.push the_event
+		end
+
+		events.sort {|x,y|
+			begin 
+				x_date = Date.parse x["start_date"]
+				y_date = Date.parse y["start_date"] 
+				y_date <=> x_date
+			rescue
+				1 <=> 1
+			end
+		}
+
+
+		ordered_events = Hash.new
+		events_counter = 0
+		events.each do |event|
+			ordered_events[events_counter.to_s.to_sym] = event
 			events_counter += 1
 		end
+
 
 		data = {
 			:stage => proyecto["etapa"],
@@ -317,13 +375,15 @@ if !(defined? Test::Unit::TestCase)
 			:initiative => proyecto["iniciativa"],
 			:authors => nombres_en_plano,
 			:current_urgency => proyecto["urgencia_actual"],
-			:events => events
+			:events => ordered_events
 
 		}
 		p '<<<<<-----proyecto id :'+ proyecto["id"]
 		p data
 		p '----->>>>>'
 		
+
+
 		RestClient.put url, data, {:content_type => :json}
 
 
