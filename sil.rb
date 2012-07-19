@@ -33,7 +33,7 @@ class SilRobot
 		#Definir el nombre de la variable como un tr puesto que es un row en la lista de Proyectos de ley
 		result = Hash.new
 		result["id"] = tr.at_xpath('td[1]/span/text()').to_s.strip
-		#puts 'procesando el proyecto '+ result['id']
+		puts '<<<<<-----procesando el proyecto '+ result['id']
 		url = tr.at_xpath('td[3]/a/@href').to_html.strip
 		begin
 			url = @base_url+result["id"]
@@ -95,6 +95,21 @@ class SilRobot
 			file = open(url)
 			html = file.read
 			boletin["link_al_proyecto_de_ley"] = obtieneElLinkAlProyectoDeLey(html)
+			require 'net/http'
+
+			Net::HTTP.start("sil.congreso.cl") { |http|
+
+			  resp = http.get(boletin["link_al_proyecto_de_ley"])
+			  if resp.code == "200" && !resp.body.empty?
+			  	open("proyecto.doc", "wb") { |file|
+				    file.write(resp.body)
+			    }
+		    	proyecto_de_ley = %x[antiword proyecto.doc]
+		    	p "hay proyecto de ley"
+			  end
+
+			  
+			}
 		rescue Exception=>e
 			
 		end
@@ -136,7 +151,7 @@ class SilRobot
 			if subetapa.include? "Ingreso de proyecto"
 				begin
 					id_doc = tr.at_xpath("td[5]/span/input")["onclick"].match(/\d*,(\d*)/)[1]
-					return "http://sil.congreso.cl/docsil/proy"+id_doc+".doc"
+					return "/docsil/proy"+id_doc+".doc"
 				rescue Exception=>e
 					p "no pude sacar el proyecto de ley pero la traté de sacar de aquí"
 					p tr.at_xpath("td[5]/span/input")["onclick"]
@@ -378,7 +393,6 @@ if !(defined? Test::Unit::TestCase)
 			:events => ordered_events
 
 		}
-		p '<<<<<-----proyecto id :'+ proyecto["id"]
 		p data
 		p '----->>>>>'
 		
