@@ -1,10 +1,13 @@
 import re
 import urllib
 import MLStripper
+import sys
 	
-def main():
+def main(url):
 	#get html from url
-	file = urllib.urlopen("http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=getDoctoSesion&iddocto=35414")
+	#file = urllib.urlopen("http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=getDoctoSesion&iddocto=35414")
+	print "url: " + url
+	file = urllib.urlopen(url)
 	html = ""
 	for line in file:
 		html += line
@@ -35,10 +38,10 @@ def main():
 	session = rx_session.findall(clean_html)
 
 	#print to stdout
-	print "bill numbers: " + ",".join(bill_nums)
-	print "date: " + " ".join(date)
-	print "legislature: " + legislature[0]
-	print "session: " + session[0]
+	print "bill numbers: " + ",".join(bill_nums) + ";",
+	print "date: " + " ".join(date) + ";",
+	print "legislature: " + legislature[0] + ";",
+	print "session: " + session[0],
 
 #from d/m/y to m/d/y
 #month name from spanish to english
@@ -53,4 +56,4 @@ def date_sp_2_en(date):
 	return en_date
 
 if __name__ == '__main__':
-	main()
+	main(str(sys.argv[1]))
