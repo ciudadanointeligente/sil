@@ -77,7 +77,8 @@ if !(defined? Test::Unit::TestCase)
 				:date => session['date'],
 				:chamber => session['chamber'],
 				:legislature => session['legislature'],
-				:session => session['session']
+				:session => session['session'],
+				:bill_list => session['bills']
 			}
 			#TODO: adds table id to each bill (bill collection) using POST operation
 
