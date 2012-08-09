@@ -1,22 +1,32 @@
+import sys
 import re
 import urllib
 import MLStripper
 import sys
 	
-def main(url):
+def py_parser(html):
 	#get html from url
-	#file = urllib.urlopen("http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=getDoctoSesion&iddocto=35414")
-	print "url: " + url
-	file = urllib.urlopen(url)
+	file = urllib.urlopen(html)
 	html = ""
 	for line in file:
 		html += line
 	#strip html tags
 	clean_html = MLStripper.strip_tags(html)
-
 	#get bill numbers
 	rx_bills = re.compile('\(.*Bolet(.*\d*\.{0,1}\d+-\d+)*.*\)')
 	bills = rx_bills.findall(clean_html)
+	#if the table is relevant
+	if len(bills) != 0:
+		process_table(clean_html)
+	else:
+		#if the table not contain bills information
+		print "skipped"
+
+#only use in case of relevant tables
+def process_table(clean_html):
+	rx_bills = re.compile('\(.*Bolet(.*\d*\.{0,1}\d+-\d+)*.*\)')
+	bills = rx_bills.findall(clean_html)
+
 	bill_nums = []
 	rx_bill_num = re.compile('(\d{0,3})[^0-9]*(\d{0,3})[^0-9]*(\d{1,3})[^0-9]*(-)[^0-9]*(\d{2})')
 	for bill in bills:
@@ -56,4 +66,7 @@ def date_sp_2_en(date):
 	return en_date
 
 if __name__ == '__main__':
-	main(str(sys.argv[1]))
+	#print '--------------------------->'
+	#print sys.argv[1]
+	#print '<---------------------------'
+	py_parser(sys.argv[1])
