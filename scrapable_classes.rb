@@ -22,12 +22,30 @@ class ScrapableSite
 		end
 	end
 
-	def doc_urls
-		@url
+	def read url = @url
+		# it would be better if instead we used
+		# mimetype = `file -Ib #{path}`.gsub(/\n/,"")
+		if !url.scan(/pdf/).empty?
+			doc_pdf = PDF::Reader.new(open(url))
+			doc = ''
+			doc_pdf.pages.each do |page|
+				doc += page.text
+			end
+		else
+			doc = open(url).read
+		end
+		doc
 	end
 
-	def read doc = @url
-		open(doc).read
+	def get_link(url, base_url, xpath)
+                html = Nokogiri::HTML.parse(read(url), nil, 'utf-8')
+                base_url + html.xpath(xpath).first['href']
+        end
+
+#----- Undefined Functions -----
+
+	def doc_urls
+		[@url]
 	end
 
 	def get_info doc
@@ -64,8 +82,8 @@ class CongressTable < ScrapableSite
 	end
 
 	def save formatted_info
-		#RestClient.put @API_url, formatted_info, {:content_type => :json}
-		p formatted_info
+		RestClient.put @API_url, formatted_info, {:content_type => :json}
+		#p formatted_info
 	end
 
 end
@@ -122,37 +140,61 @@ class CurrentLowChamberTable < CongressTable
 	def initialize()
                 super()
                 @url = 'http://www.camara.cl/trabajamos/sala_sesiones.aspx'
-		@base_url = 'http://www.camara.cl/trabajamos/'
                 @chamber = 'C.Diputados'
+		@session_base_url = 'http://www.camara.cl/trabajamos/'
+		@table_base_url = 'http://www.camara.cl'
 		@session_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td[2]/a'
-		@table_xpath = ''
+		@table_xpath = '//*[@id="ctl00_mainPlaceHolder_docpdf"]/li/a'
         end
 
 #----- REDEFINED -----
 	def doc_urls
-		html = Nokogiri::HTML.parse(read(@url), nil, 'utf-8')
-
-		#//*[@id="detail"]/table/tbody/tr[1]/td[2]/a
-		#//*[@id="detail"]/table/tbody/tr[2]/td[2]/a
-
-                #doc.xpath('//*[@id="detail"]/table/tbody/tr[(position()>0)]/td[2]/a/@href').each do |tr|
-                html.xpath('//*[@id="detail"]/table/tbody/tr[1]/td[2]/a').first['href']
-		#p html.css('div.detail a')
+		doc_urls_array = Array.new
+		session_url = get_link(@url, @session_base_url, @session_xpath)
+		table_url = get_link(session_url, @table_base_url, @table_xpath)
+		doc_urls_array.push(table_url)
+                # get all with doc.xpath('//*[@id="detail"]/table/tbody/tr[(position()>0)]/td[2]/a/@href').each do |tr|
 	end
 
 	def get_info doc
-		reader = PDF::Reader.new("doc")
+		# get bills
+		rx_bills = /Bolet(.*\d+-\d+)*/
+		bills = doc.scan(rx_bills)
+		
+		bill_list = []
+		rx_bill_num = /(\d{0,3})[^0-9]*(\d{0,3})[^0-9]*(\d{1,3})[^0-9]*(-)[^0-9]*(\d{2})/
+		bills.each do |bill|
+			bill.first.scan(rx_bill_num).each do |bill_num_array|
+				bill_num = (bill_num_array).join('')
+				bill_list.push(bill_num)
+			end
+		end
+
+		#get date
+		rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
+		date_sp = doc.scan(rx_date).first
+		date = date_sp_2_en(date_sp).join(' ')
+
+		# get legislature
+		rx_legislature = /(\d{3}).+LEGISLATURA/
+		legislature = doc.scan(rx_legislature).to_s
+
+		# get session
+		rx_session = /Sesi.+?(\d{1,3})/
+		session = doc.scan(rx_session).to_s
+
+		return {'bill_list' => bill_list, 'date' => date, 'legislature' => legislature, 'session' => session}
 	end
 
-	#DELETE!!!
-	def process
-                doc_urls.each do |doc_url|
-			p doc_url
-                end
-        end
-
-#----- NEW -----
-	def go_to
-
+	def date_sp_2_en date
+		day = date [0]
+		month = date [1]
+		year = date [2]
+	
+		months = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
+	
+		en_date = [months[month], day, year]
+		return en_date
 	end
+
 end

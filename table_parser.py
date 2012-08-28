@@ -12,17 +12,10 @@ def py_parser(html):
 		html += line
 	#strip html tags
 	clean_html = MLStripper.strip_tags(html)
-	#get bill numbers
-	rx_bills = re.compile('\(.*Bolet(.*\d*\.{0,1}\d+-\d+)*.*\)')
-	bills = rx_bills.findall(clean_html)
-	#if the table is relevant
-	if len(bills) != 0:
-		process_table(clean_html)
-	else:
-		#if the table not contain bills information
-		print "skipped"
+	#process table
+	process_table(clean_html)
 
-#only use in case of relevant tables
+#processes table, prints results or "skipped" if it's not a table
 def process_table(clean_html):
 	rx_bills = re.compile('\(.*Bolet(.*\d*\.{0,1}\d+-\d+)*.*\)')
 	bills = rx_bills.findall(clean_html)
@@ -44,14 +37,18 @@ def process_table(clean_html):
 	rx_legislature = re.compile('LEGISLATURA.+(\d{3})')
 	legislature = rx_legislature.findall(clean_html)
 	#get session
-	rx_session = re.compile('Sesi.+?(\d{1,2})')
+	rx_session = re.compile('Sesi.+?(\d{1,3})')
 	session = rx_session.findall(clean_html)
-
+	
 	#print to stdout
-	print "bill numbers: " + ",".join(bill_nums) + ";",
-	print "date: " + " ".join(date) + ";",
-	print "legislature: " + legislature[0] + ";",
-	print "session: " + session[0],
+	if bill_nums and date and legislature and session:
+		print "bill numbers: " + ",".join(bill_nums) + ";",
+		print "date: " + " ".join(date) + ";",
+		print "legislature: " + legislature[0] + ";",
+		print "session: " + session[0],
+
+	else:
+		print "skipped"
 
 #from d/m/y to m/d/y
 #month name from spanish to english
