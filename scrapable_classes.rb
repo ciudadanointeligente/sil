@@ -129,7 +129,7 @@ class CurrentHighChamberTable < CongressTable
                 info['session'] = scraped_vals.scan(/session: (\d*)/).flatten[0]
                 info['legislature'] = scraped_vals.scan(/legislature: (\d*)/).flatten[0]
                 info['date'] = scraped_vals.scan(/date: (\w*) (\d{2}) (\d{4})/).join(' ')
-                info['bill_list'] = scraped_vals.scan(/bill numbers: (\S*)/).flatten[0].split(/,/)
+                info['bill_list'] = scraped_vals.scan(/bill numbers: (\S*);/).flatten[0].split(/,/)
 
 		info
         end
@@ -177,11 +177,11 @@ class CurrentLowChamberTable < CongressTable
 
 		# get legislature
 		rx_legislature = /(\d{3}).+LEGISLATURA/
-		legislature = doc.scan(rx_legislature).to_s
+		legislature = doc.scan(rx_legislature).flatten.first
 
 		# get session
 		rx_session = /Sesi.+?(\d{1,3})/
-		session = doc.scan(rx_session).to_s
+		session = doc.scan(rx_session).flatten.first
 
 		return {'bill_list' => bill_list, 'date' => date, 'legislature' => legislature, 'session' => session}
 	end
