@@ -125,10 +125,10 @@ class CurrentHighChamberTable < CongressTable
 		info = Hash.new
                 #exec python script
                 scraped_vals = %x[python table_parser.py '#{doc}'].gsub(/\n/,' ')
-
+		
                 info['session'] = scraped_vals.scan(/session: (\d*)/).flatten[0]
                 info['legislature'] = scraped_vals.scan(/legislature: (\d*)/).flatten[0]
-                info['date'] = scraped_vals.scan(/date: (\w*) (\d{2}) (\d{4})/).join(' ')
+                info['date'] = scraped_vals.scan(/date: (\w*) (\d{1,2}) (\d{4})/).join(' ')
                 info['bill_list'] = scraped_vals.scan(/bill numbers: (\S*);/).flatten[0].split(/,/)
 
 		info
