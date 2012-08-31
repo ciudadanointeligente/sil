@@ -32,11 +32,11 @@ class SilRobot
 	def procesarUnProyectoDeLey(tr)
 		#Definir el nombre de la variable como un tr puesto que es un row en la lista de Proyectos de ley
 		result = Hash.new
-		result["id"] = tr.at_xpath('td[1]/span/text()').to_s.strip
-		puts '<<<<<-----procesando el proyecto '+ result['id']
+		result["uid"] = tr.at_xpath('td[1]/span/text()').to_s.strip
+		puts '<<<<<-----procesando el proyecto '+ result['uid']
 		url = tr.at_xpath('td[3]/a/@href').to_html.strip
 		begin
-			url = @base_url+result["id"]
+			url = @base_url+result["uid"]
 			file = open(url)
 			html = file.read
 			resto_del_boletin = procesarUnBoletin(html)
@@ -150,8 +150,8 @@ class SilRobot
 			subetapa = tr.at_xpath("td[3]/span/text()").text
 			if subetapa.include? "Ingreso de proyecto"
 				begin
-					id_doc = tr.at_xpath("td[5]/span/input")["onclick"].match(/\d*,(\d*)/)[1]
-					return "/docsil/proy"+id_doc+".doc"
+					uid_doc = tr.at_xpath("td[5]/span/input")["onclick"].match(/\d*,(\d*)/)[1]
+					return "/docsil/proy"+uid_doc+".doc"
 				rescue Exception=>e
 					p "no pude sacar el proyecto de ley pero la traté de sacar de aquí"
 					p tr.at_xpath("td[5]/span/input")["onclick"]
@@ -384,7 +384,7 @@ if !(defined? Test::Unit::TestCase)
 		data = {
 			:stage => proyecto["etapa"],
 			:origin_chamber => proyecto["camara_origen"],
-			:id => proyecto['id'],
+			:uid => proyecto['uid'],
 			:title => proyecto["title"],
 			:creation_date => proyecto["fecha_de_ingreso"],
 			:initiative => proyecto["iniciativa"],
