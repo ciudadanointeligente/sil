@@ -72,7 +72,7 @@ class CongressTable < ScrapableSite
 
 	def format info
 		formatted_info = {
-        		:id => info['legislature'] + '-' + info['session'],
+        		:uid => info['legislature'] + '-' + info['session'],
                         :date => info['date'],
                         :chamber => @chamber,
                         :legislature => info['legislature'],
