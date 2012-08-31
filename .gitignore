@@ -26,3 +26,6 @@ MLStripper.pyc
 #bundler stuff
 /vendor
 *.lock
+
+#temp file
+proyecto.doc

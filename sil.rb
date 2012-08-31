@@ -32,11 +32,11 @@ class SilRobot
 	def procesarUnProyectoDeLey(tr)
 		#Definir el nombre de la variable como un tr puesto que es un row en la lista de Proyectos de ley
 		result = Hash.new
-		result["id"] = tr.at_xpath('td[1]/span/text()').to_s.strip
-		#puts 'procesando el proyecto '+ result['id']
+		result["uid"] = tr.at_xpath('td[1]/span/text()').to_s.strip
+		puts '<<<<<-----procesando el proyecto '+ result['uid']
 		url = tr.at_xpath('td[3]/a/@href').to_html.strip
 		begin
-			url = @base_url+result["id"]
+			url = @base_url+result["uid"]
 			file = open(url)
 			html = file.read
 			resto_del_boletin = procesarUnBoletin(html)
@@ -58,7 +58,13 @@ class SilRobot
 		boletin["iniciativa"] = html.at_xpath(path_base+path_detalle+'[4]/td[2]/span/text()').text.strip
 		boletin["camara_origen"] = html.at_xpath(path_base+path_detalle+'[5]/td[2]/span/text()').text.strip
 		boletin["etapa"] = html.at_xpath(path_base+path_detalle+'[6]/td[2]/span/text()').text.strip
+		if !html.at_xpath(path_base+path_detalle+'[5]/td[4]/span/text()').nil?
+			boletin["urgencia_actual"] = html.at_xpath(path_base+path_detalle+'[5]/td[4]/span/text()').text.strip
+		else
+			boletin["urgencia_actual"] = ""
+		end
 		boletin["url_tramitacion"] = html.at_xpath(path_base+path_url+'td/a/@href').text.strip
+
 		boletin["url_oficios"] = html.at_xpath(path_base+path_url+'td[3]/a/@href').text.strip
 		boletin["url_urgencias"] = html.at_xpath(path_base+path_url+'td[6]/a/@href').text.strip
 		url_autores = html.at_xpath('//td[7]/a/@href')
@@ -81,6 +87,31 @@ class SilRobot
 			boletin["tramitaciones"] = procesarTramitaciones(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["tramitaciones"] = Array.new
+		end
+
+		begin
+			url = @url_tramitacion_base+boletin["url_tramitacion"]
+			file = open(url)
+			html = file.read
+			boletin["link_al_proyecto_de_ley"] = obtieneElLinkAlProyectoDeLey(html)
+			require 'net/http'
+
+			Net::HTTP.start("sil.congreso.cl") { |http|
+
+			  resp = http.get(boletin["link_al_proyecto_de_ley"])
+			  if resp.code == "200" && !resp.body.empty?
+			  	open("proyecto.doc", "wb") { |file|
+				    file.write(resp.body)
+			    }
+		    	proyecto_de_ley = %x[antiword proyecto.doc]
+		    	p "hay proyecto de ley"
+			  end
+
+			  
+			}
+		rescue Exception=>e
+			
 		end
 		begin
 			url = @url_oficios_base+boletin["url_oficios"]
@@ -89,6 +120,7 @@ class SilRobot
 			boletin["oficios"] = procesarOficios(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["oficios"] = Array.new
 		end
 		begin
 			url = @url_urgencias_base+boletin["url_urgencias"]
@@ -97,6 +129,7 @@ class SilRobot
 			boletin["urgencias"] = procesarUrgencias(html)
 		rescue Exception=>e
 			# handle e
+                        boletin["urgencias"] = Array.new
 		end
 
 		boletin
@@ -109,16 +142,51 @@ class SilRobot
 		end
 		tramitaciones
 	end
+
+	def obtieneElLinkAlProyectoDeLey(html)
+		html = Nokogiri::HTML(html, nil, 'utf-8')
+		tramitaciones  = Array.new
+		html.xpath('/html/body/table//tr/td/table//tr[not(position()<3)]').each do |tr|
+			subetapa = tr.at_xpath("td[3]/span/text()").text
+			if subetapa.include? "Ingreso de proyecto"
+				begin
+					uid_doc = tr.at_xpath("td[5]/span/input")["onclick"].match(/\d*,(\d*)/)[1]
+					return "/docsil/proy"+uid_doc+".doc"
+				rescue Exception=>e
+					p "no pude sacar el proyecto de ley pero la traté de sacar de aquí"
+					p tr.at_xpath("td[5]/span/input")["onclick"]
+
+				end
+				
+			end
+
+		end
+	end
+
 	def procesarUnaTramitacion(tr)
 		tramitacion = Hash.new
 		tramitacion["sesion"] = tr.at_xpath("td[1]/span/text()").text.strip
-		tramitacion["fecha"] = tr.at_xpath("td[2]/span/text()").text.strip
+		fecha = tr.at_xpath("td[2]/span/text()").text.strip
+                fecha.gsub!(" ","")
+                begin
+                    fecha = Date.strptime(fecha, "%d/%m/%Y").to_s
+                rescue e
+
+                    fecha = nil
+                end
+                tramitacion["fecha"] = fecha
+                
 		subetapa = tr.at_xpath("td[3]/span/text()").text
 		tramitacion["subetapa"] = subetapa.strip
 		etapa = tr.at_xpath("td[4]/span/text()").text
-
 		tramitacion["etapa"] = etapa.strip
-		codifica(tramitacion)
+
+		tramitacion = codifica(tramitacion)
+		tramitacion["etapa"].gsub!(" ","")
+		tramitacion["subetapa"].gsub!(" ","")
+		tramitacion["sesion"].gsub!(" ","")
+
+		tramitacion
 	end
 	def procesarOficios(html)
 		html = Nokogiri::HTML(html, nil, 'utf-8')
@@ -134,7 +202,9 @@ class SilRobot
 		oficio['fecha'] = tr.at_xpath("td[2]/span/text()").text.strip
 		oficio['oficio'] = tr.at_xpath("td[3]/span/text()").text.strip
 		oficio['etapa'] = tr.at_xpath("td[4]/span/text()").text.strip
-		
+		if oficio['oficio'].valid_encoding?
+			return oficio
+		end
 		codifica(oficio)
 	end
 	def procesarUrgencias(html)
@@ -149,9 +219,23 @@ class SilRobot
 		urgencia = Hash.new
 		val = tr.at_xpath("td[5]/span/text()").to_s
 		urgencia['numero'] = tr.at_xpath("td[1]/span/text()").to_s.strip
-		urgencia['fecha_inicio'] = tr.at_xpath("td[2]/span/text()").to_s.strip
+                fecha_inicio = tr.at_xpath("td[2]/span/text()").to_s.strip
+                fecha_inicio.gsub!(" ","")
+                begin
+                    fecha_inicio = Date.strptime(fecha_inicio, "%d/%m/%y").to_s
+                rescue
+                    fecha_inicio = nil
+                end
+		urgencia['fecha_inicio'] = fecha_inicio
 		urgencia['numero_mensaje_ingreso'] = tr.at_xpath("td[3]/span/text()").to_s.strip
-		urgencia['fecha_termino'] = tr.at_xpath("td[4]/span/text()").to_s.strip
+                fecha_termino = tr.at_xpath("td[4]/span/text()").to_s.strip
+                fecha_termino.gsub!(" ","")
+                begin
+                    fecha_termino = Date.strptime(fecha_termino,"%d/%m/%y").to_s
+                rescue
+                    fecha_termino = nil
+                end
+		urgencia['fecha_termino'] = fecha_termino
 		urgencia['numero_mensaje_termino'] = tr.at_xpath("td[5]/span/text()").to_s.strip
 		codifica(urgencia)
 	end
@@ -220,7 +304,10 @@ class SilRobot
 	def procesaUnAutor(tr)
 		autor = Hash.new
 		autor['nombre'] = tr.at_xpath("td/span[contains(@class,'TEXTarticulo')]/text()").to_s
-		codifica(autor)
+		autor = codifica(autor)
+		autor['nombre'].gsub!(" ","")
+		autor 
+		
 
 	end
 end
@@ -237,33 +324,92 @@ if !(defined? Test::Unit::TestCase)
 	robot.from_where = 1
 	robot.lamb = lambda {|proyecto, a|
 		url = 'http://api.ciudadanointeligente.cl/billit/cl/bills'
+        #url = 'http://localhost:8080/bills'
 		creation_date = robot.parseaUnaFecha(proyecto["fecha_de_ingreso"])
 		a.push(proyecto)
 		nombres_en_plano = Array.new
 		if !proyecto['autores'].nil?
 			proyecto['autores'].each do |author|
-				nombres_en_plano.push(author['nombre'].strip)
+                                nombre = author['nombre'].strip
+                                nombre.gsub!(" ","")
+				nombres_en_plano.push(nombre)
 			end
 		end
+		events = Array.new
+		events_counter = 0
+		proyecto["tramitaciones"].each do |tramitacion|
+			the_event = {
+				"session" => tramitacion["sesion"],
+				"start_date" => tramitacion["fecha"],
+				"end_date" => tramitacion["fecha"],
+				"stage" => tramitacion["etapa"],
+				"sub_stage" => tramitacion["subetapa"],
+				"type" => "Tramitación"
+			}
+			events.push the_event
+			events_counter += 1
+		end
+
+		proyecto["urgencias"].each do |urgencia|
+			the_event = {
+				"number" => urgencia['numero'],
+				"start_date" => urgencia['fecha_inicio'],
+				"end_date" => urgencia['fecha_termino'],
+				"number_message_start" => urgencia['numero_mensaje_ingreso'],
+				"number_message_start" => urgencia['numero_mensaje_termino'],
+				"type" => "Urgencia"
+			}
+			events.push the_event
+		end
+
+		events.sort {|x,y|
+			begin 
+				x_date = Date.parse x["start_date"]
+				y_date = Date.parse y["start_date"] 
+				y_date <=> x_date
+			rescue
+				1 <=> 1
+			end
+		}
+
+
+		ordered_events = Hash.new
+		events_counter = 0
+		events.each do |event|
+			ordered_events[events_counter.to_s.to_sym] = event
+			events_counter += 1
+		end
+
+
 		data = {
 			:stage => proyecto["etapa"],
 			:origin_chamber => proyecto["camara_origen"],
-			:id => proyecto['id'],
+			:uid => proyecto['uid'],
 			:title => proyecto["title"],
 			:creation_date => proyecto["fecha_de_ingreso"],
 			:initiative => proyecto["iniciativa"],
-			:authors => nombres_en_plano.join('|')
+			:authors => nombres_en_plano,
+			:current_urgency => proyecto["urgencia_actual"],
+			:events => ordered_events
+
 		}
-		p '<<<<<-----proyecto id :'+ proyecto["id"]
 		p data
 		p '----->>>>>'
 		
+
+
 		RestClient.put url, data, {:content_type => :json}
+
+
+
+
+
 	}
 
 	resultado = robot.procesar
 	puts '3/3 Terminado'
+
+
+
 end
-
-
 
