@@ -2,72 +2,86 @@
 require 'rubygems'
 require 'nokogiri'
 require 'rest-client'
-require 'open-uri'
 require 'pdf-reader'
 
-class ScrapableSite
-	def initialize(url = '')
-		@url = url
-	end
+module RestfulApiMethods
+	require 'open-uri'
 
-	def process
-		doc_urls.each do |doc_url|
-			begin
-				doc = read doc_url
-				info = get_info doc
-				formatted_info = format info
-				save formatted_info
-			rescue Exception=>e
-			end
-		end
-	end
-
-	def read url = @url
-		# it would be better if instead we used
-		# mimetype = `file -Ib #{path}`.gsub(/\n/,"")
-		if !url.scan(/pdf/).empty?
-			doc_pdf = PDF::Reader.new(open(url))
-			doc = ''
-			doc_pdf.pages.each do |page|
-				doc += page.text
-			end
-		else
-			doc = open(url).read
-		end
-		doc
-	end
-
-	def get_link(url, base_url, xpath)
-                html = Nokogiri::HTML.parse(read(url), nil, 'utf-8')
-                base_url + html.xpath(xpath).first['href']
-        end
-
-#----- Undefined Functions -----
-
-	def doc_urls
-		[@url]
-	end
-
-	def get_info doc
-		doc
-	end
+	@model =  ''
+	@API_url = ''
 
 	def format info
 		info
 	end
 
-	def save info
-		p info
+	def put formatted_info
+		RestClient.put @API_url + @model, formatted_info, {:content_type => :json}
 	end
-		
+
+	def post formatted_info
+		RestClient.post @API_url + @model, formatted_info, {:content_type => :json}
+	end
 end
 
-class CongressTable < ScrapableSite
+class StorageableInfo
+	include RestfulApiMethods
+
+	def initialize(location = '')
+		@API_url = 'http://api.ciudadanointeligente.cl/billit/cl/'
+		@location = location
+	end
+
+	def process
+		doc_locations.each do |doc_location|
+			begin
+				doc = read doc_location
+				info = get_info doc
+				formatted_info = format info
+				save formatted_info
+			rescue Exception=>e
+				p e
+			end
+		end
+	end
+
+	def read location = @location
+		# it would be better if instead we used
+		# mimetype = `file -Ib #{path}`.gsub(/\n/,"")
+		if location.class.name != 'String'
+			doc = location
+		elsif !location.scan(/pdf/).empty?
+			doc_pdf = PDF::Reader.new(open(location))
+			doc = ''
+			doc_pdf.pages.each do |page|
+				doc += page.text
+			end
+		else
+			doc = open(location).read
+		end
+		doc
+	end
+
+#----- Undefined Functions -----
+
+	def doc_locations
+		[@location]
+	end
+
+	def get_info doc
+		doc
+	end
+end
+
+class CongressTable < StorageableInfo
 
 	def initialize()
 		super()
-		@API_url = 'http://api.ciudadanointeligente.cl/billit/cl/tables'
+		@model = 'tables'
 		@chamber = ''
+	end
+
+	def save formatted_info
+		put formatted_info
 	end
 
 	def format info
@@ -81,27 +95,26 @@ class CongressTable < ScrapableSite
 		}
 	end
 
-	def save formatted_info
-		RestClient.put @API_url, formatted_info, {:content_type => :json}
-		#p formatted_info
-	end
-
+	def get_link(url, base_url, xpath)
+                html = Nokogiri::HTML.parse(read(url), nil, 'utf-8')
+                base_url + html.xpath(xpath).first['href']
+        end
 end
 
 class CurrentHighChamberTable < CongressTable
 	def initialize()
 		super()
-		@url = 'http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
+		@location = 'http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
 		@base_url = 'http://www.senado.cl'
 		@chamber = 'Senado'
 	end
 
 	#python scripts reads and parses
 	def process
-                doc_urls.each do |doc_url|
+                doc_locations.each do |doc_location|
                         begin
-                                #doc = read doc_url
-                                info = get_info doc_url
+                                #doc = read doc_location
+                                info = get_info doc_location
                                 formatted_info = format info
                                 save formatted_info
                         rescue Exception=>e
@@ -109,15 +122,15 @@ class CurrentHighChamberTable < CongressTable
                 end
         end
 
-	def doc_urls
-		html = Nokogiri::HTML(read(@url), nil, 'utf-8')
-		doc_urls = Array.new
+	def doc_locations
+		html = Nokogiri::HTML(read(@location), nil, 'utf-8')
+		doc_locations = Array.new
 
 		html.xpath('//*[@id="contentTopI"]/div[1]/div[2]/table//tr[(position()>2)]').each do |tr|
 			table_url = tr.at_xpath('td[5]/a/@href').to_s.strip
-                     	doc_urls.push @base_url + table_url
+                     	doc_locations.push @base_url + table_url
 		end
-		return doc_urls
+		return doc_locations
 	end
 
 	def get_info doc
@@ -139,7 +152,7 @@ class CurrentLowChamberTable < CongressTable
 
 	def initialize()
                 super()
-                @url = 'http://www.camara.cl/trabajamos/sala_sesiones.aspx'
+                @location = 'http://www.camara.cl/trabajamos/sala_sesiones.aspx'
                 @chamber = 'C.Diputados'
 		@session_base_url = 'http://www.camara.cl/trabajamos/'
 		@table_base_url = 'http://www.camara.cl'
@@ -148,11 +161,11 @@ class CurrentLowChamberTable < CongressTable
         end
 
 #----- REDEFINED -----
-	def doc_urls
-		doc_urls_array = Array.new
-		session_url = get_link(@url, @session_base_url, @session_xpath)
+	def doc_locations
+		doc_locations_array = Array.new
+		session_url = get_link(@location, @session_base_url, @session_xpath)
 		table_url = get_link(session_url, @table_base_url, @table_xpath)
-		doc_urls_array.push(table_url)
+		doc_locations_array.push(table_url)
                 # get all with doc.xpath('//*[@id="detail"]/table/tbody/tr[(position()>0)]/td[2]/a/@href').each do |tr|
 	end
 
@@ -197,4 +210,59 @@ class CurrentLowChamberTable < CongressTable
 		return en_date
 	end
 
+end
+
+
+
+class BillCategory < StorageableInfo
+
+	def initialize
+		super()
+		@location = 'bill_categories'
+		@bills_location = 'bills'
+		@match_info_location = 'categories'
+		@model = 'bills'
+
+		@bills = parse(read(@bills_location))
+		@categorized_bills = parse(read(@match_info_location))
+	end
+
+	def save formatted_info
+		post formatted_info
+	end
+
+	def doc_locations
+		parse(read(@location))
+	end
+
+	def parse doc
+		doc_hash = {}
+		doc.split(/\n/).each do |pair|
+			key, val = pair.split(/\t/)
+			if doc_hash.has_key?(key)
+				doc_hash[key].push(val)
+			else
+				doc_hash.store(key, [val])
+			end
+		end
+		doc_hash
+	end
+
+	def get_info doc
+		bill, cat_ids = doc
+		cat_array = []
+		cat_ids.each do |cat_id|
+			cat_val = @categorized_bills[cat_id]
+			cat_array.push(cat_val)
+		end
+		[bill, cat_array]
+	end
+
+	def format info
+		bill, categories = info
+	        formatted_info = {
+                :uid => @bills[bill].first,
+                :matters => categories.join('|')
+        	}
+	end
 end
